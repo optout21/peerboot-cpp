@@ -1,0 +1,12 @@
+v0.1:
+- PeerBoot net peers connections
+- configured PB peers
+- NO peer propagation, no fixed well-known peers
+- connection from client
+- storage of peer info
+- propagation of peer info (send and receive)
+- NO Query
+- NO memory or bandwith caps
+- TCP connections
+- NO UDP
+
