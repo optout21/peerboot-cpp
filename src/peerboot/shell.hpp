@@ -1,27 +1,32 @@
-/**
- * Top-level enclosure for the PeerBoot library and client.
- */
-
 #pragma once
 
 #include "../include/peerboot.hpp"
+#include "ipebo_net.hpp"
 #include <string>
 
 namespace pebo
 {
-    class shell
+    /**
+     * Top-level enclosure for the PeerBoot library and client.
+     */
+    class Shell
     {
     public:
-        shell();
-        ~shell();
-        pebo::errorCode init(pebo::notification_cb callback_in);
-        pebo::errorCode deinit();
+        Shell();
+        ~Shell();
+        errorCode init(service_t service_in, endpoint_t endpoint_in, notification_cb callback_in);
+        errorCode deinit();
+        // Override methods for testing
+        void setPeboNet(IPeboNet* peboNet_in);
 
     private:
-        void doCallback(pebo::peer_t peer_in);
+        void doClientCallback(peer_t const & peer_in);
+        errorCode doNetBroadcast(peer_t const & peer_in);
 
     private:
         bool myInited;
-        pebo::notification_cb myCallback;
+        peer_t myPeer;
+        notification_cb myCallback;
+        IPeboNet* myPeboNet;
     };
 }

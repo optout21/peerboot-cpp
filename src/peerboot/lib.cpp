@@ -7,7 +7,7 @@
 #include <cassert>
 
 // Global single shell object
-pebo::shell* global_instance = nullptr;
+pebo::Shell* global_instance = nullptr;
 
 pebo::errorCode pebo::init(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::notification_cb callback_in)
 {
@@ -20,8 +20,8 @@ pebo::errorCode pebo::init(pebo::service_t service_in, pebo::endpoint_t endpoint
     assert (::global_instance == nullptr);
     
     // create and init library
-    pebo::shell* shell_new = new pebo::shell();
-    pebo::errorCode err = shell_new->init(callback_in);
+    pebo::Shell* shell_new = new pebo::Shell();
+    pebo::errorCode err = shell_new->init(service_in, endpoint_in, callback_in);
     if (err)
     {
         delete shell_new;
@@ -42,7 +42,7 @@ pebo::errorCode pebo::deinit()
     }
     assert(::global_instance != nullptr);
 
-    pebo::shell* shell_old = ::global_instance;
+    pebo::Shell* shell_old = ::global_instance;
     ::global_instance = nullptr;
 
     // deinit lib

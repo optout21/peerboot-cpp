@@ -1,8 +1,7 @@
-add_library(libpeerboot
-	ipebo_net.hpp
-	lib.cpp
-	shell.cpp
-	shell.hpp)
+add_library(libpbtest
+	test_pebo_net.cpp
+    test_pebo_net.hpp
+)
 
 target_compile_definitions(libpeerboot
 	PRIVATE
