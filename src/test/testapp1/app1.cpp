@@ -22,6 +22,7 @@ int main()
     TestPeboNet* testPeboNet = new TestPeboNet();
     Shell* shell = new Shell();
     shell->setPeboNet(testPeboNet);
+    testPeboNet->setNotifyCB(shell);
     pebo::errorCode err = shell->init(service, endpoint, ::notification_cb);
     if (err)
     {

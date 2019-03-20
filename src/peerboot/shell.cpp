@@ -1,4 +1,5 @@
 #include "shell.hpp"
+#include "pebo_net.hpp"
 #include <cassert>
 
 using namespace pebo;
@@ -29,7 +30,19 @@ errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, notification
     // save client info
     myPeer = peer_t { service_in, endpoint_in, 0};  // TODO time
     myCallback = callback_in;
-    // TODO create myPeboNet
+
+    if (myPeboNet == nullptr)
+    {
+        // default component
+        myPeboNet = new PeboNet();
+        myPeboNet->setNotifyCB(this);
+    }
+    assert(myPeboNet != nullptr);
+    errorCode res = myPeboNet->init();
+    if (res)
+    {
+        return res;
+    }
 
     // broadcast this client to the net
     doNetBroadcast(myPeer);
@@ -59,6 +72,12 @@ void Shell::setPeboNet(IPeboNet* peboNet_in)
         myPeboNet = nullptr;
     }
     myPeboNet = peboNet_in;
+}
+
+void Shell::notifyFromPeboNet(peer_t peer_in)
+{
+    // callback from network, notify client
+    doClientCallback(peer_in);
 }
 
 void Shell::doClientCallback(peer_t const & peer_in)

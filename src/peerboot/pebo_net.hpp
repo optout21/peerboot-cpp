@@ -1,12 +1,16 @@
 #pragma once
-#include "../../peerboot/ipebo_net.hpp"
+#include "ipebo_net.hpp"
 
 namespace pebo
 {
-    class TestPeboNet : public IPeboNet
+    /**
+     * Represents the PeerBoot network.
+     * TODO: fill it
+     */
+    class PeboNet : public IPeboNet
     {
     public:
-        TestPeboNet() = default;
+        PeboNet() = default;
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
         errorCode init();
         errorCode broadcast(peer_t peer_in);

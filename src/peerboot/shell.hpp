@@ -9,7 +9,7 @@ namespace pebo
     /**
      * Top-level enclosure for the PeerBoot library and client.
      */
-    class Shell
+    class Shell: public IPeboNetCB
     {
     public:
         Shell();
@@ -18,6 +18,7 @@ namespace pebo
         errorCode deinit();
         // Override methods for testing
         void setPeboNet(IPeboNet* peboNet_in);
+        void notifyFromPeboNet(peer_t peer_in);
 
     private:
         void doClientCallback(peer_t const & peer_in);

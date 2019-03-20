@@ -22,6 +22,7 @@ namespace pebo
         err_generic = 1,
         err_libNotInited,
         err_libAlreadyInited,
+        err_libConfigErrorPeboNet,
     };
 
     /**
