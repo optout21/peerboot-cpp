@@ -14,6 +14,11 @@ errorCode PeboNet::init()
     return errorCode::err_ok;
 }
 
+errorCode PeboNet::deinit()
+{
+    return errorCode::err_ok;
+}
+
 errorCode PeboNet::broadcast(peer_t peer_in)
 {
     // TODO send to network

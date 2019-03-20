@@ -39,6 +39,7 @@ namespace pebo
         pebo::service_t service;
         pebo::endpoint_t endpoint;
         pebo::timestamp_t last_seen;
+        bool removed;
     };
 
     /**

@@ -1,3 +1,5 @@
+find_package(Threads)
+
 # sources of this exec
 add_executable(testapp1
 	app1.cpp
@@ -20,6 +22,7 @@ target_link_libraries(testapp1
 	libpeerboot
     libpbtest
 	${PLATFORM_LIBS}
+    ${CMAKE_THREAD_LIBS_INIT}
 )
 
 if(NOT APPLE)

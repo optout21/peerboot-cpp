@@ -59,9 +59,15 @@ errorCode Shell::deinit()
     assert(myInited);
     myInited = false;
 
+    errorCode res = errorCode::err_ok;
+    if (myPeboNet == nullptr)
+    {
+        errorCode res2 = myPeboNet->deinit();
+        if (res2 && !res) res = res2;
+    }
     myCallback = nullptr;
 
-    return errorCode::err_ok;
+    return res;
 }
 
 void Shell::setPeboNet(IPeboNet* peboNet_in)

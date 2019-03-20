@@ -13,6 +13,7 @@ namespace pebo
         PeboNet() = default;
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
         errorCode init();
+        errorCode deinit();
         errorCode broadcast(peer_t peer_in);
 
     private:
