@@ -1,6 +1,7 @@
 add_library(libpeerboot
-	peerboot.cpp
-    peerboot.hpp)
+	lib.cpp
+	shell.cpp
+	shell.hpp)
 
 target_compile_definitions(libpeerboot
 	PRIVATE
@@ -10,4 +11,4 @@ target_compile_definitions(libpeerboot
 set_target_properties(libpeerboot
 	PROPERTIES
 		COMPILE_FLAGS
-"-DSOMEPROP=1")
+			"-DSOMEPROP=1")
