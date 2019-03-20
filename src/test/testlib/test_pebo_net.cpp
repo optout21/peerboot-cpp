@@ -26,14 +26,14 @@ errorCode TestPeboNet::deinit()
     return errorCode::err_ok;
 }
 
-errorCode TestPeboNet::broadcast(peer_t peer_in)
+errorCode TestPeboNet::broadcast(PeerInfo peer_in)
 {
     // store in our vector
     myPeers.push_back(peer_in);
     return errorCode::err_ok;
 }
 
-errorCode TestPeboNet::doClientCallback(peer_t peer_in)
+errorCode TestPeboNet::doClientCallback(PeerInfo peer_in)
 {
     assert(myPeboNetCB != nullptr);
     myPeboNetCB->notifyFromPeboNet(peer_in);
@@ -58,7 +58,7 @@ void TestPeboNet::addPeer()
 {
     string endpoint = "enpoint_";
     endpoint.append(to_string(myPeerCounter));
-    peer_t peer { myServiceName, endpoint, 0 };
+    PeerInfo peer { myServiceName, endpoint, 0 };
     ++myPeerCounter;
     myPeers.push_back(peer);
 
@@ -76,7 +76,7 @@ void TestPeboNet::fillPeers()
 void TestPeboNet::checkPeers()
 {
     // replace a peer
-    peer_t peer_remove = myPeers[0];
+    PeerInfo peer_remove = myPeers[0];
     myPeers.erase(myPeers.begin());
     // notify leaving
     peer_remove.removed = true;

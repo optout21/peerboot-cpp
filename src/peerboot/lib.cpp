@@ -9,7 +9,7 @@
 // Global single shell object
 pebo::Shell* global_instance = nullptr;
 
-pebo::errorCode pebo::init(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::notification_cb callback_in)
+pebo::errorCode pebo::init(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::NotificationCB callback_in)
 {
     // TODO: thread-safe access to global instance
     if (::global_instance != nullptr)

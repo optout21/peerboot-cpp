@@ -4,9 +4,9 @@
 using namespace pebo;
 using namespace std;
 
-void notification_cb(pebo::peer_t peer_in)
+void notificationCB(pebo::PeerInfo peer_in)
 {
-    cout << "Notification: " << (peer_in.removed ? "Removed" : "added  ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.last_seen << endl;
+    cout << "Notification: " << (peer_in.removed ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.last_seen << endl;
 }
 
 int main()
@@ -15,7 +15,7 @@ int main()
 
     pebo::service_t service ("sample.peerboot.io");
     pebo::endpoint_t endpoint ("dummy_endpoint");
-    pebo::errorCode err = pebo::init(service, endpoint, ::notification_cb);
+    pebo::errorCode err = pebo::init(service, endpoint, ::notificationCB);
     if (err)
     {
         cerr << "Could not initialize PeerBoot library, err: " << err << " service: " << service << " endpoint: " << endpoint << endl;

@@ -33,7 +33,7 @@ namespace pebo
     /**
      * Describes a peer (client peer, not PB peer).
      */
-    struct peer_t
+    struct PeerInfo
     {
     public:
         pebo::service_t service;
@@ -46,14 +46,14 @@ namespace pebo
      * Callback for notification of new endpoints.
      * Called by the library.  Called from another thread.
      */
-    typedef void (*notification_cb)(pebo::peer_t peer_in);
+    typedef void (*NotificationCB)(pebo::PeerInfo peer_in);
 
     /*
      * Initialize the PeerBoot library and PeerBoot peer client.
      * One instance per process.
      * @return: 0 for success, >0 for errors
      */
-    pebo::errorCode init(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::notification_cb callback_in);
+    pebo::errorCode init(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::NotificationCB callback_in);
 
     /**
      * De-initialize the library and PeerBoot peer client.

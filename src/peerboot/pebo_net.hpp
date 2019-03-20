@@ -14,10 +14,10 @@ namespace pebo
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
         errorCode init();
         errorCode deinit();
-        errorCode broadcast(peer_t peer_in);
+        errorCode broadcast(PeerInfo peer_in);
 
     private:
-        errorCode doClientCallback(peer_t peer_in);
+        errorCode doClientCallback(PeerInfo peer_in);
 
     private:
         IPeboNetCB* myPeboNetCB;

@@ -9,7 +9,7 @@ namespace pebo
     class IPeboNetCB
     {
     public:
-        virtual void notifyFromPeboNet(peer_t peer_in) = 0;
+        virtual void notifyFromPeboNet(PeerInfo peer_in) = 0;
     };
 
     /**
@@ -22,6 +22,6 @@ namespace pebo
         virtual errorCode init() = 0;
         virtual errorCode deinit() = 0;
         // Broadcast peer info towards the network
-        virtual errorCode broadcast(peer_t peer_in) = 0;
+        virtual errorCode broadcast(PeerInfo peer_in) = 0;
     };
 }

@@ -16,7 +16,7 @@ Shell::~Shell()
     deinit();
 }
 
-errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, notification_cb callback_in)
+errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in)
 {
     // TODO thread-safe access to inited
     if (myInited)
@@ -28,7 +28,7 @@ errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, notification
     myInited = true;
 
     // save client info
-    myPeer = peer_t { service_in, endpoint_in, 0};  // TODO time
+    myPeer = PeerInfo { service_in, endpoint_in, 0};  // TODO time
     myCallback = callback_in;
 
     if (myPeboNet == nullptr)
@@ -80,13 +80,13 @@ void Shell::setPeboNet(IPeboNet* peboNet_in)
     myPeboNet = peboNet_in;
 }
 
-void Shell::notifyFromPeboNet(peer_t peer_in)
+void Shell::notifyFromPeboNet(PeerInfo peer_in)
 {
     // callback from network, notify client
     doClientCallback(peer_in);
 }
 
-void Shell::doClientCallback(peer_t const & peer_in)
+void Shell::doClientCallback(PeerInfo const & peer_in)
 {
     // TODO thread safety
     if (myCallback == nullptr)
@@ -97,7 +97,7 @@ void Shell::doClientCallback(peer_t const & peer_in)
     myCallback(peer_in);
 }
 
-errorCode Shell::doNetBroadcast(peer_t const & peer_in)
+errorCode Shell::doNetBroadcast(PeerInfo const & peer_in)
 {
     // TODO thread safety
     assert(myPeboNet != nullptr);

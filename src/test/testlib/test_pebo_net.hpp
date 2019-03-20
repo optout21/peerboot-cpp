@@ -15,10 +15,10 @@ namespace pebo
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
         errorCode init();
         errorCode deinit();
-        errorCode broadcast(peer_t peer_in);
+        errorCode broadcast(PeerInfo peer_in);
 
     private:
-        errorCode doClientCallback(peer_t peer_in);
+        errorCode doClientCallback(PeerInfo peer_in);
         void doBgThread();
         void addPeer();
         void fillPeers();
@@ -29,7 +29,7 @@ namespace pebo
         std::thread myBgThread;
         static const int myNumPeers = 5;
         static const std::string myServiceName;
-        std::vector<peer_t> myPeers;
+        std::vector<PeerInfo> myPeers;
         int myPeerCounter;
     };
 }

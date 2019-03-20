@@ -14,20 +14,20 @@ namespace pebo
     public:
         Shell();
         ~Shell();
-        errorCode init(service_t service_in, endpoint_t endpoint_in, notification_cb callback_in);
+        errorCode init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in);
         errorCode deinit();
         // Override methods for testing
         void setPeboNet(IPeboNet* peboNet_in);
-        void notifyFromPeboNet(peer_t peer_in);
+        void notifyFromPeboNet(PeerInfo peer_in);
 
     private:
-        void doClientCallback(peer_t const & peer_in);
-        errorCode doNetBroadcast(peer_t const & peer_in);
+        void doClientCallback(PeerInfo const & peer_in);
+        errorCode doNetBroadcast(PeerInfo const & peer_in);
 
     private:
         bool myInited;
-        peer_t myPeer;
-        notification_cb myCallback;
+        PeerInfo myPeer;
+        NotificationCB myCallback;
         IPeboNet* myPeboNet;
     };
 }

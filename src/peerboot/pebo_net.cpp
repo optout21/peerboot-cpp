@@ -19,13 +19,13 @@ errorCode PeboNet::deinit()
     return errorCode::err_ok;
 }
 
-errorCode PeboNet::broadcast(peer_t peer_in)
+errorCode PeboNet::broadcast(PeerInfo peer_in)
 {
     // TODO send to network
     return errorCode::err_generic;
 }
 
-errorCode PeboNet::doClientCallback(peer_t peer_in)
+errorCode PeboNet::doClientCallback(PeerInfo peer_in)
 {
     assert(myPeboNetCB != nullptr);
     myPeboNetCB->notifyFromPeboNet(peer_in);
