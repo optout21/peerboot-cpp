@@ -3,6 +3,7 @@
 #include <cassert>
 
 using namespace pebo;
+using namespace std;
 
 Shell::Shell() :
 myInited(false),
@@ -34,7 +35,7 @@ errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, Notification
     if (myPeboNet == nullptr)
     {
         // default component
-        myPeboNet = new PeboNet();
+        myPeboNet = make_shared<PeboNet>();
         myPeboNet->setNotifyCB(this);
     }
     assert(myPeboNet != nullptr);
@@ -70,13 +71,8 @@ errorCode Shell::deinit()
     return res;
 }
 
-void Shell::setPeboNet(IPeboNet* peboNet_in)
+void Shell::setPeboNet(shared_ptr<IPeboNet> & peboNet_in)
 {
-    if (myPeboNet != nullptr)
-    {
-        delete myPeboNet;
-        myPeboNet = nullptr;
-    }
     myPeboNet = peboNet_in;
 }
 

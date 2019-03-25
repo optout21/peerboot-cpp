@@ -2,6 +2,7 @@
 
 #include "../include/peerboot.hpp"
 #include "ipebo_net.hpp"
+#include <memory>
 #include <string>
 
 namespace pebo
@@ -17,7 +18,7 @@ namespace pebo
         errorCode init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in);
         errorCode deinit();
         // Override methods for testing
-        void setPeboNet(IPeboNet* peboNet_in);
+        void setPeboNet(std::shared_ptr<IPeboNet> & peboNet_in);
         void notifyFromPeboNet(PeerInfo peer_in);
 
     private:
@@ -28,6 +29,6 @@ namespace pebo
         bool myInited;
         PeerInfo myPeer;
         NotificationCB myCallback;
-        IPeboNet* myPeboNet;
+        std::shared_ptr<IPeboNet> myPeboNet;
     };
 }

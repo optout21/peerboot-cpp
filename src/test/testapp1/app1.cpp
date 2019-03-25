@@ -2,6 +2,7 @@
 #include "../testlib/test_pebo_net.hpp"
 #include "../../peerboot/shell.hpp"
 #include <iostream>
+#include <memory>
 
 using namespace pebo;
 using namespace std;
@@ -19,7 +20,7 @@ int main()
     pebo::endpoint_t endpoint ("dummy_endpoint");
 
     // Create components
-    TestPeboNet* testPeboNet = new TestPeboNet();
+    auto testPeboNet = shared_ptr<IPeboNet>(make_shared<TestPeboNet>());
     Shell* shell = new Shell();
     shell->setPeboNet(testPeboNet);
     testPeboNet->setNotifyCB(shell);
