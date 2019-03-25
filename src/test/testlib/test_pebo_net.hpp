@@ -1,5 +1,6 @@
 #pragma once
 #include "../../peerboot/ipebo_net.hpp"
+#include <memory>
 #include <thread>
 #include <vector>
 
@@ -12,7 +13,7 @@ namespace pebo
     {
     public:
         TestPeboNet() = default;
-        void setNotifyCB(IPeboNetCB* peboNetCB_in);
+        void setNotifyCB(std::shared_ptr<IPeboNetCB> peboNetCB_in);
         errorCode init();
         errorCode deinit();
         errorCode broadcast(PeerInfo peer_in);
@@ -25,7 +26,7 @@ namespace pebo
         void checkPeers();
 
     private:
-        IPeboNetCB* myPeboNetCB;
+        std::shared_ptr<IPeboNetCB> myPeboNetCB;
         std::thread myBgThread;
         static const int myNumPeers = 5;
         static const std::string myServiceName;

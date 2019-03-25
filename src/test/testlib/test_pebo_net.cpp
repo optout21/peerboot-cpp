@@ -9,7 +9,7 @@ using namespace std;
 const int TestPeboNet::myNumPeers;
 const std::string TestPeboNet::myServiceName = "test.peerboot.io";
 
-void TestPeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
+void TestPeboNet::setNotifyCB(std::shared_ptr<IPeboNetCB> peboNetCB_in)
 {
     myPeboNetCB = peboNetCB_in;
 }

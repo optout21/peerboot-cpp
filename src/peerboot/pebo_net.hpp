@@ -1,5 +1,6 @@
 #pragma once
 #include "ipebo_net.hpp"
+#include <memory>
 
 namespace pebo
 {
@@ -11,7 +12,7 @@ namespace pebo
     {
     public:
         PeboNet() = default;
-        void setNotifyCB(IPeboNetCB* peboNetCB_in);
+        void setNotifyCB(std::shared_ptr<IPeboNetCB> peboNetCB_in);
         errorCode init();
         errorCode deinit();
         errorCode broadcast(PeerInfo peer_in);
@@ -20,6 +21,6 @@ namespace pebo
         errorCode doClientCallback(PeerInfo peer_in);
 
     private:
-        IPeboNetCB* myPeboNetCB;
+        std::shared_ptr<IPeboNetCB> myPeboNetCB;
     };
 }

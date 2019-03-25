@@ -4,7 +4,7 @@
 
 using namespace pebo;
 
-void PeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
+void PeboNet::setNotifyCB(std::shared_ptr<IPeboNetCB> peboNetCB_in)
 {
     myPeboNetCB = peboNetCB_in;
 }

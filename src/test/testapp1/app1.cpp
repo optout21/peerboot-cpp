@@ -21,7 +21,7 @@ int main()
 
     // Create components
     auto testPeboNet = shared_ptr<IPeboNet>(make_shared<TestPeboNet>());
-    Shell* shell = new Shell();
+    auto shell = make_shared<Shell>();
     shell->setPeboNet(testPeboNet);
     testPeboNet->setNotifyCB(shell);
     pebo::errorCode err = shell->init(service, endpoint, ::notificationCB);
