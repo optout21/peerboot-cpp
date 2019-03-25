@@ -1,6 +1,8 @@
 #pragma once
 #include "ipebo_net.hpp"
+#include "ipebo_peer.hpp"
 #include <memory>
+#include <vector>
 
 namespace pebo
 {
@@ -12,15 +14,18 @@ namespace pebo
     {
     public:
         PeboNet() = default;
-        void setNotifyCB(std::shared_ptr<IPeboNetCB> peboNetCB_in);
+        void setNotifyCB(IPeboNetCB* peboNetCB_in);
         errorCode init();
         errorCode deinit();
-        errorCode broadcast(PeerInfo peer_in);
+        errorCode addPeer(std::shared_ptr<IPeboPeer> const & peer_in);
+        errorCode broadcast(PeerInfo const & peer_in);
 
     private:
-        errorCode doClientCallback(PeerInfo peer_in);
+        errorCode doBroadcast(PeerInfo const & peer_in);
+        errorCode doClientCallback(PeerInfo const & peer_in);
 
     private:
-        std::shared_ptr<IPeboNetCB> myPeboNetCB;
+        IPeboNetCB* myPeboNetCB;
+        std::vector<std::shared_ptr<IPeboPeer>> myNetPeers;
     };
 }

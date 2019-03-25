@@ -9,7 +9,7 @@ using namespace std;
 const int TestPeboNet::myNumPeers;
 const std::string TestPeboNet::myServiceName = "test.peerboot.io";
 
-void TestPeboNet::setNotifyCB(std::shared_ptr<IPeboNetCB> peboNetCB_in)
+void TestPeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
 {
     myPeboNetCB = peboNetCB_in;
 }
@@ -22,18 +22,19 @@ errorCode TestPeboNet::init()
 
 errorCode TestPeboNet::deinit()
 {
+    myBgThreadStop = true;
     myBgThread.join();
     return errorCode::err_ok;
 }
 
-errorCode TestPeboNet::broadcast(PeerInfo peer_in)
+errorCode TestPeboNet::broadcast(PeerInfo const & peer_in)
 {
     // store in our vector
     myPeers.push_back(peer_in);
     return errorCode::err_ok;
 }
 
-errorCode TestPeboNet::doClientCallback(PeerInfo peer_in)
+errorCode TestPeboNet::doClientCallback(PeerInfo const & peer_in)
 {
     assert(myPeboNetCB != nullptr);
     myPeboNetCB->notifyFromPeboNet(peer_in);
@@ -47,7 +48,7 @@ void TestPeboNet::doBgThread()
     {
         addPeer();
     }
-    while (true)
+    while (!myBgThreadStop)
     {
         std::this_thread::sleep_for(std::chrono::seconds(3));
         checkPeers();

@@ -1,6 +1,7 @@
 #include "shell.hpp"
 #include "pebo_net.hpp"
 #include <cassert>
+#include <iostream>
 
 using namespace pebo;
 using namespace std;
@@ -36,7 +37,7 @@ errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, Notification
     {
         // default component
         myPeboNet = make_shared<PeboNet>();
-        myPeboNet->setNotifyCB(shared_ptr<IPeboNetCB>(this));
+        myPeboNet->setNotifyCB(this);
     }
     assert(myPeboNet != nullptr);
     errorCode res = myPeboNet->init();
@@ -61,10 +62,11 @@ errorCode Shell::deinit()
     myInited = false;
 
     errorCode res = errorCode::err_ok;
-    if (myPeboNet == nullptr)
+    if (myPeboNet != nullptr)
     {
         errorCode res2 = myPeboNet->deinit();
         if (res2 && !res) res = res2;
+        myPeboNet = nullptr;
     }
     myCallback = nullptr;
 

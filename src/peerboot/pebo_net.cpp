@@ -3,8 +3,9 @@
 #include <iostream>
 
 using namespace pebo;
+using namespace std;
 
-void PeboNet::setNotifyCB(std::shared_ptr<IPeboNetCB> peboNetCB_in)
+void PeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
 {
     myPeboNetCB = peboNetCB_in;
 }
@@ -19,13 +20,28 @@ errorCode PeboNet::deinit()
     return errorCode::err_ok;
 }
 
-errorCode PeboNet::broadcast(PeerInfo peer_in)
+errorCode PeboNet::addPeer(shared_ptr<IPeboPeer> const & peer_in)
 {
-    // TODO send to network
+    // TODO threadsafety
+    myNetPeers.push_back(peer_in);
+}
+
+errorCode PeboNet::broadcast(PeerInfo const & peer_in)
+{
+    return doBroadcast(peer_in);
+}
+
+errorCode PeboNet::doBroadcast(PeerInfo const & peer_in)
+{
+    // TODO threadsafety
+    for(auto i = myNetPeers.begin(); i != myNetPeers.end(); ++i)
+    {
+        i->get()->send(peer_in);
+    }
     return errorCode::err_generic;
 }
 
-errorCode PeboNet::doClientCallback(PeerInfo peer_in)
+errorCode PeboNet::doClientCallback(PeerInfo const & peer_in)
 {
     assert(myPeboNetCB != nullptr);
     myPeboNetCB->notifyFromPeboNet(peer_in);

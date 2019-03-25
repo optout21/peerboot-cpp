@@ -54,6 +54,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 add_subdirectory(src/peerboot)
 add_subdirectory(src/test/testlib)
 add_subdirectory(src/test/testapp1)
+add_subdirectory(src/test/testapp2)
 add_subdirectory(src/sample/sampleclientapp)
 
 #set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)

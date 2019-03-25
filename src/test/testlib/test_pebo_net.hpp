@@ -13,21 +13,22 @@ namespace pebo
     {
     public:
         TestPeboNet() = default;
-        void setNotifyCB(std::shared_ptr<IPeboNetCB> peboNetCB_in);
+        void setNotifyCB(IPeboNetCB* peboNetCB_in);
         errorCode init();
         errorCode deinit();
-        errorCode broadcast(PeerInfo peer_in);
+        errorCode broadcast(PeerInfo const & peer_in);
 
     private:
-        errorCode doClientCallback(PeerInfo peer_in);
+        errorCode doClientCallback(PeerInfo const & peer_in);
         void doBgThread();
         void addPeer();
         void fillPeers();
         void checkPeers();
 
     private:
-        std::shared_ptr<IPeboNetCB> myPeboNetCB;
+        IPeboNetCB* myPeboNetCB;
         std::thread myBgThread;
+        bool myBgThreadStop;
         static const int myNumPeers = 5;
         static const std::string myServiceName;
         std::vector<PeerInfo> myPeers;
