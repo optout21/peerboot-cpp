@@ -17,9 +17,9 @@ namespace pebo
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
         errorCode init();
         errorCode deinit();
-        errorCode addPeer(long id_in, std::shared_ptr<IPeboPeer> const & peer_in) { assert(false); };
+        errorCode addPeer(std::string id_in, std::shared_ptr<IPeboPeer> const & peer_in) { assert(false); };
         errorCode broadcast(PeerInfo const & peer_in);
-        void notifyFromPeboPeer(long id_in, PeerInfo peer_in) { assert(false); }
+        void notifyFromPeboPeer(std::string id_in, PeerInfo peer_in) { assert(false); }
 
     private:
         errorCode doClientCallback(PeerInfo const & peer_in);

@@ -9,6 +9,6 @@ namespace pebo
     class IPeboPeerCB
     {
     public:
-        virtual void notifyFromPeboPeer(long id_in, PeerInfo peer_in) = 0;
+        virtual void notifyFromPeboPeer(std::string id_in, PeerInfo peer_in) = 0;
     };
 }

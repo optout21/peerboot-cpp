@@ -10,8 +10,8 @@ namespace pebo
     class TestPeboPeer: public IPeboPeer
     {
     public:
-        TestPeboPeer(pebo::service_t service_in, long id_in);
-        long getId() const { return myId; }
+        TestPeboPeer(pebo::service_t service_in, int num_in);
+        std::string getId() const { return myId; }
         void setNotifyCB(IPeboPeerCB* peboPeerCB_in);
         // Send a peer info towards this peer
         errorCode send(PeerInfo const & peer_in);
@@ -25,7 +25,8 @@ namespace pebo
     private:
         pebo::service_t myService;
         pebo::endpoint_t myEndpoint;
-        long myId;
+        int myNum;
+        std::string myId;
         IPeboPeerCB* myPeboPeerCB;
         std::thread myBgThread;
         bool myBgThreadStop;
