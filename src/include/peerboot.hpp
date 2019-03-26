@@ -46,7 +46,7 @@ namespace pebo
      * Callback for notification of new endpoints.
      * Called by the library.  Called from another thread.
      */
-    typedef void (*NotificationCB)(pebo::PeerInfo peer_in);
+    typedef void (*NotificationCB)(pebo::PeerInfo self_in, pebo::PeerInfo peer_in);
 
     /*
      * Initialize the PeerBoot library and PeerBoot peer client.

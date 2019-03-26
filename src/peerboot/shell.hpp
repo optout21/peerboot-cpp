@@ -21,6 +21,8 @@ namespace pebo
         void setPeboNet(std::shared_ptr<IPeboNet> & peboNet_in);
         std::shared_ptr<IPeboNet> getPeboNet() const { return myPeboNet; }
         void notifyFromPeboNet(PeerInfo peer_in);
+        errorCode broadcast_refresh();
+        errorCode broadcast_bye();
 
     private:
         void doClientCallback(PeerInfo const & peer_in);

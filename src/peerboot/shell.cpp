@@ -20,6 +20,7 @@ Shell::~Shell()
 
 errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in)
 {
+    cerr << "Shell::init" << endl;
     // TODO thread-safe access to inited
     if (myInited)
     {
@@ -47,7 +48,7 @@ errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, Notification
     }
 
     // broadcast this client to the net
-    doNetBroadcast(myPeer);
+    broadcast_refresh();
 
     return errorCode::err_ok;
 }
@@ -84,6 +85,16 @@ void Shell::notifyFromPeboNet(PeerInfo peer_in)
     doClientCallback(peer_in);
 }
 
+errorCode Shell::broadcast_refresh()
+{
+    return doNetBroadcast(PeerInfo { myPeer.service, myPeer.endpoint, myPeer.last_seen, false });
+}
+
+errorCode Shell::broadcast_bye()
+{
+    return doNetBroadcast(PeerInfo { myPeer.service, myPeer.endpoint, myPeer.last_seen, true });
+}
+
 void Shell::doClientCallback(PeerInfo const & peer_in)
 {
     // TODO thread safety
@@ -92,11 +103,12 @@ void Shell::doClientCallback(PeerInfo const & peer_in)
         return;
     }
     assert(myCallback != nullptr);
-    myCallback(peer_in);
+    myCallback(myPeer, peer_in);
 }
 
 errorCode Shell::doNetBroadcast(PeerInfo const & peer_in)
 {
+    //cerr << "Shell::doNetBroadcast" << endl;
     // TODO thread safety
     assert(myPeboNet != nullptr);
     errorCode res = myPeboNet->broadcast(peer_in);

@@ -1,8 +1,10 @@
 add_library(libpbtest
+	connector_peer.cpp
+	connector_peer.hpp
+	simul_client.cpp
+	simul_client.hpp
 	test_pebo_net.cpp
     test_pebo_net.hpp
-	test_pebo_peer.cpp
-	test_pebo_peer.hpp
 )
 
 target_compile_definitions(libpeerboot
