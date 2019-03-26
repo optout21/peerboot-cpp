@@ -1,11 +1,10 @@
 add_library(libpeerboot
 	ipebo_net.hpp
 	ipebo_peer.hpp
+	ipebo_peer_cb.hpp
 	lib.cpp
 	pebo_net.cpp
 	pebo_net.hpp
-	pebo_peer.cpp
-	pebo_peer.hpp
 	shell.cpp
 	shell.hpp
 )

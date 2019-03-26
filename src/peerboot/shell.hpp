@@ -19,6 +19,7 @@ namespace pebo
         errorCode deinit();
         // Override methods for testing
         void setPeboNet(std::shared_ptr<IPeboNet> & peboNet_in);
+        std::shared_ptr<IPeboNet> getPeboNet() const { return myPeboNet; }
         void notifyFromPeboNet(PeerInfo peer_in);
 
     private:

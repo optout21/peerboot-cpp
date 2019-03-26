@@ -1,5 +1,7 @@
 #pragma once
 #include "../include/peerboot.hpp"
+#include "ipebo_peer_cb.hpp"
+#include "ipebo_peer.hpp"
 #include <memory>
 
 namespace pebo
@@ -16,12 +18,13 @@ namespace pebo
     /**
      * Represents the PeerBoot network.
      */
-    class IPeboNet
+    class IPeboNet : public IPeboPeerCB
     {
     public:
         virtual void setNotifyCB(IPeboNetCB* peboNetCB_in) = 0;
         virtual errorCode init() = 0;
         virtual errorCode deinit() = 0;
+        virtual errorCode addPeer(long id_in, std::shared_ptr<IPeboPeer> const & peer_in) = 0;
         // Broadcast peer info towards the network
         virtual errorCode broadcast(PeerInfo const & peer_in) = 0;
     };

@@ -1,7 +1,9 @@
 #include "../../include/peerboot.hpp"
 #include "../../peerboot/shell.hpp"
+#include "../testlib/test_pebo_peer.hpp"
 #include <iostream>
 #include <memory>
+#include <vector>
 
 using namespace pebo;
 using namespace std;
@@ -28,9 +30,31 @@ int main()
     }
     cout << "PeerBoot library initialized, service: " << service << " endpoint: " << endpoint << endl;
 
+    auto numPeers = 3;
+    auto peers = vector<shared_ptr<TestPeboPeer>>();
+    for(auto i = 0; i < 3; ++i)
+    {
+        peers.push_back(make_shared<TestPeboPeer>(service, i+1));
+    }
+    auto peboNet = shell->getPeboNet();
+    for(auto i = peers.begin(); i != peers.end(); ++i)
+    {
+        i->get()->setNotifyCB(peboNet.get());
+        peboNet->addPeer(i->get()->getId(), *i);
+    }
+    for(auto i = peers.begin(); i != peers.end(); ++i)
+    {
+        i->get()->start();
+    }
+
     cout << "Press Enter to exit ...";
     cin.get();
     cout << endl;
+
+    for(auto i = peers.begin(); i != peers.end(); ++i)
+    {
+        i->get()->stop();
+    }
 
     err = shell->deinit();
     cout << "PeerBoot library deinitialized, err: " << err << endl;

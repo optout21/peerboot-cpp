@@ -5,6 +5,11 @@
 using namespace pebo;
 using namespace std;
 
+PeboNet::PeboNet() :
+myPeboNetCB(nullptr)
+{
+}
+
 void PeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
 {
     myPeboNetCB = peboNetCB_in;
@@ -20,23 +25,33 @@ errorCode PeboNet::deinit()
     return errorCode::err_ok;
 }
 
-errorCode PeboNet::addPeer(shared_ptr<IPeboPeer> const & peer_in)
+errorCode PeboNet::addPeer(long id_in, shared_ptr<IPeboPeer> const & peer_in)
 {
     // TODO threadsafety
-    myNetPeers.push_back(peer_in);
+    myNetPeers.push_back(PeerWithId { id_in, peer_in });
 }
 
 errorCode PeboNet::broadcast(PeerInfo const & peer_in)
 {
-    return doBroadcast(peer_in);
+    return doBroadcast(peer_in, 0);
 }
 
-errorCode PeboNet::doBroadcast(PeerInfo const & peer_in)
+void PeboNet::notifyFromPeboPeer(long id_in, PeerInfo peer_in)
+{
+    doClientCallback(peer_in);
+    doBroadcast(peer_in, id_in);
+}
+
+errorCode PeboNet::doBroadcast(PeerInfo const & peer_in, long originatorPeer)
 {
     // TODO threadsafety
     for(auto i = myNetPeers.begin(); i != myNetPeers.end(); ++i)
     {
-        i->get()->send(peer_in);
+        // skip originator
+        if (i->id != originatorPeer)
+        {
+            i->peer->send(peer_in);
+        }
     }
     return errorCode::err_generic;
 }

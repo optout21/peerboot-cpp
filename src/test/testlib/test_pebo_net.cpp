@@ -50,7 +50,12 @@ void TestPeboNet::doBgThread()
     }
     while (!myBgThreadStop)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        for (auto i = 0; i < 3; ++i)
+        {
+            if (myBgThreadStop) break;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        if (myBgThreadStop) break;
         checkPeers();
     }
 }
