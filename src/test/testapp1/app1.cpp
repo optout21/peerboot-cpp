@@ -9,7 +9,7 @@ using namespace std;
 
 void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
 {
-    cout << "Notification " << self_in.endpoint << ": " << (peer_in.removed ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.last_seen << endl;
+    cout << "Notification " << self_in.endpoint << ": " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << endl;
 }
 
 int main()

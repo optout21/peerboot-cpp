@@ -20,7 +20,6 @@ Shell::~Shell()
 
 errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in)
 {
-    cerr << "Shell::init" << endl;
     // TODO thread-safe access to inited
     if (myInited)
     {
@@ -87,12 +86,12 @@ void Shell::notifyFromPeboNet(PeerInfo peer_in)
 
 errorCode Shell::broadcast_refresh()
 {
-    return doNetBroadcast(PeerInfo { myPeer.service, myPeer.endpoint, myPeer.last_seen, false });
+    return doNetBroadcast(PeerInfo { myPeer.service, myPeer.endpoint, myPeer.lastSeen, false });
 }
 
 errorCode Shell::broadcast_bye()
 {
-    return doNetBroadcast(PeerInfo { myPeer.service, myPeer.endpoint, myPeer.last_seen, true });
+    return doNetBroadcast(PeerInfo { myPeer.service, myPeer.endpoint, myPeer.lastSeen, true });
 }
 
 void Shell::doClientCallback(PeerInfo const & peer_in)

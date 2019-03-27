@@ -11,7 +11,7 @@ using namespace std;
 
 void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
 {
-    cout << "Notification " << self_in.endpoint << ": " << (peer_in.removed ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.last_seen << endl;
+    cout << "Notification " << self_in.endpoint << ": " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << endl;
 }
 
 int main()
@@ -23,7 +23,7 @@ int main()
     pebo::endpoint_t endpoint_base ("endpoint_");
 
     // Create shell components
-    auto numClients = 2;
+    auto numClients = 4;
     auto shells = vector<shared_ptr<Shell>>();
     auto clients = vector<shared_ptr<SimulClient>>();
     for(auto i = 0; i < numClients; ++i)
@@ -49,7 +49,6 @@ int main()
             {
                // connect s1 with s2, using a ConnectedClient
                string id = "cp_" + to_string(s1) + "_" + to_string(s2);
-               cerr << "id: " << id << endl;
                auto peerPair = ConnectorPeer::createConnectedPair(id);
                shells[s1]->getPeboNet()->addPeer(id, peerPair.first);
                peerPair.first->setNotifyCB(shells[s1]->getPeboNet().get());

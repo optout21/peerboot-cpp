@@ -1,6 +1,7 @@
 #pragma once
 #include "ipebo_net.hpp"
 #include "ipebo_peer.hpp"
+#include "store.hpp"
 #include <memory>
 #include <vector>
 
@@ -34,5 +35,6 @@ namespace pebo
     private:
         IPeboNetCB* myPeboNetCB;
         std::vector<PeerWithId> myNetPeers;
+        Store myStore;
     };
 }

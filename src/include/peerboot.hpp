@@ -38,8 +38,8 @@ namespace pebo
     public:
         pebo::service_t service;
         pebo::endpoint_t endpoint;
-        pebo::timestamp_t last_seen;
-        bool removed;
+        pebo::timestamp_t lastSeen;
+        bool isRemoved;
     };
 
     /**

@@ -85,7 +85,7 @@ void TestPeboNet::checkPeers()
     PeerInfo peer_remove = myPeers[0];
     myPeers.erase(myPeers.begin());
     // notify leaving
-    peer_remove.removed = true;
+    peer_remove.isRemoved = true;
     doClientCallback(peer_remove);
     fillPeers();
 }
