@@ -1,5 +1,6 @@
 #include "shell.hpp"
 #include "pebo_net.hpp"
+#include "store.hpp"
 #include <cassert>
 #include <iostream>
 
@@ -9,7 +10,8 @@ using namespace std;
 Shell::Shell() :
 myInited(false),
 myCallback(nullptr),
-myPeboNet(nullptr)
+myPeboNet(nullptr),
+myStore(unique_ptr<IStore>(make_unique<Store>()))
 {
 }
 
@@ -33,10 +35,14 @@ errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, Notification
     myPeer = PeerInfo { service_in, endpoint_in, 0 };  // TODO time
     myCallback = callback_in;
 
+    // components: Store -- created upfront
+    assert (myStore != nullptr);
+    // components: PeboNet -- create if not yet set
     if (myPeboNet == nullptr)
     {
         // default component
-        myPeboNet = make_shared<PeboNet>();
+        assert (myStore != nullptr);
+        myPeboNet = make_shared<PeboNet>(myStore.get());
         myPeboNet->setNotifyCB(this);
     }
     assert(myPeboNet != nullptr);

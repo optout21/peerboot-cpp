@@ -6,10 +6,11 @@
 using namespace pebo;
 using namespace std;
 
-PeboNet::PeboNet() :
+PeboNet::PeboNet(IStore* store_in) :
 myPeboNetCB(nullptr),
-myStore()
+myStore(store_in)
 {
+    assert(myStore != nullptr);
 }
 
 void PeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
@@ -42,7 +43,7 @@ errorCode PeboNet::broadcast(PeerInfo const & peer_in)
 void PeboNet::notifyFromPeboPeer(string id_in, PeerInfo peer_in)
 {
     //cerr << "PeboNet::notifyFromPeboPeer from " << id_in << endl;
-    IStore::updateResult_t updateRes = myStore.findAndUpdate(peer_in.service, peer_in.endpoint, peer_in.isRemoved);
+    IStore::updateResult_t updateRes = myStore->findAndUpdate(peer_in.service, peer_in.endpoint, peer_in.isRemoved);
     if (updateRes == IStore::updateResult_t::upd_updatedOnlyTime ||
         updateRes == IStore::updateResult_t::upd_noChangeNeeded)
     {

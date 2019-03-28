@@ -2,6 +2,7 @@
 
 #include "../include/peerboot.hpp"
 #include "ipebo_net.hpp"
+#include "istore.hpp"
 #include <memory>
 #include <string>
 
@@ -33,5 +34,6 @@ namespace pebo
         PeerInfo myPeer;
         NotificationCB myCallback;
         std::shared_ptr<IPeboNet> myPeboNet;
+        std::unique_ptr<IStore> myStore;
     };
 }

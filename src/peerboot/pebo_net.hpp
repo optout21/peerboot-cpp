@@ -20,7 +20,7 @@ namespace pebo
             std::string id;
             std::shared_ptr<IPeboPeer> peer;
         };
-        PeboNet();
+        PeboNet(IStore* store_in);
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
         errorCode init();
         errorCode deinit();
@@ -35,6 +35,6 @@ namespace pebo
     private:
         IPeboNetCB* myPeboNetCB;
         std::vector<PeerWithId> myNetPeers;
-        Store myStore;
+        IStore* myStore;
     };
 }
