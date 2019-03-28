@@ -5,6 +5,8 @@ add_library(libpbtest
 	simul_client.hpp
 	test_pebo_net.cpp
     test_pebo_net.hpp
+	testbench_shells.cpp
+	testbench_shells.hpp
 )
 
 target_compile_definitions(libpeerboot
