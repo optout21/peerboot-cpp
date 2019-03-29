@@ -83,15 +83,37 @@ long Store::count() const
     return c;
 }
 
+vector<IStore::PeerInfo> Store::query(service_t service_in) const
+{
+    vector<IStore::PeerInfo> result;
+    // TODO thread safety
+    auto endpoints = myStore.find(service_in);
+    if (endpoints == myStore.end())
+    {
+        // service not present
+        return result;
+    }
+    for(auto e = endpoints->second.cbegin(); e != endpoints->second.cend(); ++e)
+    {
+        if (!(*e).second.isRemoved) result.push_back((*e).second);
+    }
+    return result;
+}
+
+void Store::clear()
+{
+    myStore.clear();
+}
+
 long Store::countNonremoved() const
 {
     long c = 0;
     // TODO thread safety
     for(auto s = myStore.cbegin(); s != myStore.cend(); ++s)
     {
-        for(auto e = (*s).second.cbegin(); e != (*s).second.cend(); ++e)
+        for(auto e = s->second.cbegin(); e != s->second.cend(); ++e)
         {
-            if (!(*e).second.isRemoved) ++c;
+            if (!e->second.isRemoved) ++c;
         }
     }
     return c;

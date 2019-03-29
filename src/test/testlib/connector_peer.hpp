@@ -18,9 +18,12 @@ namespace pebo
         void setNotifyCB(IPeboPeerCB* peboPeerCB_in);
         // Send a peer info towards this peer
         errorCode send(PeerInfo const & peer_in);
+        // Send a query request to this peer, results will come later asynchronously as peer updates
+        errorCode query(service_t service_in);
     
     private:
-        void doNetCallback(PeerInfo const & peer_in);
+        void doNetSendCallback(PeerInfo const & peer_in);
+        void doNetQueryCallback(service_t service_in);
 
     private:
         IPeboPeerCB* myPeboPeerCB;

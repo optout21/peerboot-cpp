@@ -45,11 +45,11 @@ void SimulClient::doBroadcast(bool removed_in)
     errorCode err;
     if (!removed_in)
     {
-        err = myShell->broadcast_refresh();
+        err = myShell->start(myService, myEndpoint);
     }
     else
     {
-        err = myShell->broadcast_bye();
+        err = myShell->stop();
     }
 }
 

@@ -18,8 +18,9 @@ void PeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
     myPeboNetCB = peboNetCB_in;
 }
 
-errorCode PeboNet::init()
+errorCode PeboNet::init(std::string id_in)
 {
+    myId = id_in;
     return errorCode::err_ok;
 }
 
@@ -37,7 +38,12 @@ errorCode PeboNet::addPeer(string id_in, shared_ptr<IPeboPeer> const & peer_in)
 
 errorCode PeboNet::broadcast(PeerInfo const & peer_in)
 {
-    return doBroadcast(peer_in, "");
+    return doBroadcast(peer_in, myId);
+}
+
+errorCode PeboNet::query(service_t service_in)
+{
+    return doQuery(myId, service_in);
 }
 
 void PeboNet::notifyFromPeboPeer(string id_in, PeerInfo peer_in)
@@ -57,6 +63,11 @@ void PeboNet::notifyFromPeboPeer(string id_in, PeerInfo peer_in)
     }
 }
 
+void PeboNet::queryFromPeboPeer(std::string id_in, service_t service_in)
+{
+    doQuery(id_in, service_in);
+}
+
 errorCode PeboNet::doBroadcast(PeerInfo const & peer_in, string originatorPeer)
 {
     //cerr << "PeboNet::doBroadcast " << myNetPeers.size() << endl;
@@ -70,6 +81,24 @@ errorCode PeboNet::doBroadcast(PeerInfo const & peer_in, string originatorPeer)
         }
     }
     return errorCode::err_generic;
+}
+
+errorCode PeboNet::doQuery(std::string id_in, service_t service_in)
+{
+    // query from store and broadcast results
+    auto result = myStore->query(service_in);
+    if (result.size() == 0)
+    {
+        // no results
+        return errorCode::err_ok;
+    }
+    for(auto i = result.cbegin(); i != result.cend(); ++i)
+    {
+        // broadcast result to net.  Originator is myself
+        cerr << "query res " << id_in << " " << i->endpoint << endl;
+        doBroadcast(pebo::PeerInfo { i->service, i->endpoint, i->lastSeenTime, i->isRemoved}, myId);
+    }
+    return errorCode::err_ok;
 }
 
 errorCode PeboNet::doClientCallback(PeerInfo const & peer_in)

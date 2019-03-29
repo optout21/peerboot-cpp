@@ -38,11 +38,26 @@ errorCode ConnectorPeer::send(PeerInfo const & peer_in)
     //cerr << "ConnectorPeer::send " << myId << endl;
     // pass it to our peer
     assert(myPeer != nullptr);
-    myPeer->doNetCallback(peer_in);
+    myPeer->doNetSendCallback(peer_in);
+    return errorCode::err_ok;
 }
 
-void ConnectorPeer::doNetCallback(PeerInfo const & peer_in)
+errorCode ConnectorPeer::query(service_t service_in)
+{
+    // pass it to our peer
+    assert(myPeer != nullptr);
+    myPeer->doNetQueryCallback(service_in);
+    return errorCode::err_ok;
+}
+
+void ConnectorPeer::doNetSendCallback(PeerInfo const & peer_in)
 {
     assert(myPeboPeerCB != nullptr);
     myPeboPeerCB->notifyFromPeboPeer(myId, peer_in);
+}
+
+void ConnectorPeer::doNetQueryCallback(service_t service_in)
+{
+    assert(myPeboPeerCB != nullptr);
+    myPeboPeerCB->queryFromPeboPeer(myId, service_in);
 }

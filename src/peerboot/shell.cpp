@@ -7,6 +7,8 @@
 using namespace pebo;
 using namespace std;
 
+int Shell::myIdCounter = 0;
+
 Shell::Shell() :
 myInited(false),
 myCallback(nullptr),
@@ -45,7 +47,8 @@ errorCode Shell::init(NotificationCB callback_in)
         myPeboNet->setNotifyCB(this);
     }
     assert(myPeboNet != nullptr);
-    errorCode res = myPeboNet->init();
+    ++myIdCounter;
+    errorCode res = myPeboNet->init("id" + to_string(myIdCounter));
     if (res)
     {
         myInited = false;
@@ -62,6 +65,17 @@ errorCode Shell::start(service_t service_in, endpoint_t endpoint_in)
 
     // broadcast this client to the net
     broadcast_refresh();
+
+    // query for other known endpoints of this service
+    doNetQuery(service_in);
+
+    return errorCode::err_ok;
+}
+
+errorCode Shell::stop()
+{
+    // broadcast good bye to the net
+    broadcast_bye();
 
     return errorCode::err_ok;
 }
@@ -128,3 +142,10 @@ errorCode Shell::doNetBroadcast(PeerInfo const & peer_in)
     return res;
 }
 
+errorCode Shell::doNetQuery(service_t service_in)
+{
+    // TODO thread safety
+    assert(myPeboNet != nullptr);
+    errorCode res = myPeboNet->query(service_in);
+    return res;
+}

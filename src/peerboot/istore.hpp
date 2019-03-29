@@ -1,5 +1,6 @@
 #pragma once
 #include "../include/peerboot.hpp"
+#include <vector>
 
 namespace pebo
 {
@@ -35,6 +36,7 @@ namespace pebo
     public:
         virtual updateResult_t findAndUpdate(pebo::service_t service_in, pebo::endpoint_t endpoint_in, bool isRemoved_in) = 0;
         virtual bool findPeer(pebo::service_t service_in, pebo::endpoint_t endpoint_in, PeerInfo & peerInfo_inout) = 0;
-        // TODO query
+        virtual std::vector<IStore::PeerInfo> query(service_t service_in) const = 0;
+        virtual void clear() = 0;
     };
 }

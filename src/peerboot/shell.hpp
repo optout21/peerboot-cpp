@@ -18,17 +18,19 @@ namespace pebo
         ~Shell();
         errorCode init(NotificationCB callback_in);
         errorCode start(service_t service_in, endpoint_t endpoint_in);
+        errorCode stop();
         errorCode deinit();
         // Override methods for testing
         void setPeboNet(std::shared_ptr<IPeboNet> & peboNet_in);
         std::shared_ptr<IPeboNet> getPeboNet() const { return myPeboNet; }
         void notifyFromPeboNet(PeerInfo peer_in);
         errorCode broadcast_refresh();
-        errorCode broadcast_bye();
 
     private:
+        errorCode broadcast_bye();
         void doClientCallback(PeerInfo const & peer_in);
         errorCode doNetBroadcast(PeerInfo const & peer_in);
+        errorCode doNetQuery(service_t service_in);
 
     private:
         bool myInited;
@@ -36,5 +38,6 @@ namespace pebo
         NotificationCB myCallback;
         std::shared_ptr<IPeboNet> myPeboNet;
         std::unique_ptr<IStore> myStore;
+        static int myIdCounter;
     };
 }

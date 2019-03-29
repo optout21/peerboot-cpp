@@ -14,7 +14,7 @@ void TestPeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
     myPeboNetCB = peboNetCB_in;
 }
 
-errorCode TestPeboNet::init()
+errorCode TestPeboNet::init(string id_in)
 {
     myBgThread = move(thread([=]() { this->doBgThread(); return 1; }));
     return errorCode::err_ok;

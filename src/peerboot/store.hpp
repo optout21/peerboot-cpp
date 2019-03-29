@@ -1,6 +1,7 @@
 #pragma once
 #include "istore.hpp"
 #include <map>
+#include <vector>
 
 namespace pebo
 {
@@ -10,17 +11,19 @@ namespace pebo
     class Store: public IStore
     {
     private:
-        typedef std::map<pebo::endpoint_t, pebo::IStore::PeerInfo> ServiceStore_t;
-        typedef std::map<pebo::service_t, ServiceStore_t> Store_t;
+        typedef std::map<endpoint_t, IStore::PeerInfo> ServiceStore_t;
+        typedef std::map<service_t, ServiceStore_t> Store_t;
 
     public:
         Store() = default;
-        updateResult_t findAndUpdate(pebo::service_t service_in, pebo::endpoint_t endpoint_in, bool isRemoved_in);
-        bool findPeer(pebo::service_t service_in, pebo::endpoint_t endpoint_in, PeerInfo & peerInfo_inout);
+        updateResult_t findAndUpdate(service_t service_in, endpoint_t endpoint_in, bool isRemoved_in);
+        bool findPeer(service_t service_in, endpoint_t endpoint_in, PeerInfo & peerInfo_inout);
         long count() const;
+        std::vector<IStore::PeerInfo> query(service_t service_in) const;
+        void clear();
 
     private:
-        void addPeer(pebo::IStore::PeerInfo peer_in);
+        void addPeer(IStore::PeerInfo peer_in);
         long countNonremoved() const;
 
     private:
