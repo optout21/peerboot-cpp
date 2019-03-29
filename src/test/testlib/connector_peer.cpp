@@ -35,7 +35,7 @@ void ConnectorPeer::setNotifyCB(IPeboPeerCB* peboPeerCB_in)
 
 errorCode ConnectorPeer::send(PeerInfo const & peer_in)
 {
-    //cerr << "ConnectorPeer::send " << myId << endl;
+    //cerr << "ConnectorPeer::send " << myId << " " << peer_in.endpoint << endl;
     // pass it to our peer
     assert(myPeer != nullptr);
     myPeer->doNetSendCallback(peer_in);
@@ -52,6 +52,7 @@ errorCode ConnectorPeer::query(service_t service_in)
 
 void ConnectorPeer::doNetSendCallback(PeerInfo const & peer_in)
 {
+    //cerr << "ConnectorPeer::doNetSendCallback " << myId << " " << peer_in.endpoint << endl;
     assert(myPeboPeerCB != nullptr);
     myPeboPeerCB->notifyFromPeboPeer(myId, peer_in);
 }

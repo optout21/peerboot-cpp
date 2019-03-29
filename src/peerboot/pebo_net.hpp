@@ -32,6 +32,7 @@ namespace pebo
 
     private:
         errorCode doBroadcast(PeerInfo const & peer_in, std::string originatorPeer);
+        errorCode doBroadcastQuery(service_t service_in, std::string originatorPeer);
         errorCode doQuery(std::string id_in, service_t service_in);
         errorCode doClientCallback(PeerInfo const & peer_in);
 
