@@ -2,6 +2,7 @@
 #include "../../peerboot/shell.hpp"
 #include "../testlib/testbench_shells.hpp"
 #include "../testlib/simul_client.hpp"
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -11,14 +12,15 @@ using namespace std;
 
 void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
 {
-    if (self_in.endpoint[self_in.endpoint.length() - 1] == '0')
+    auto lastchar = self_in.endpoint[self_in.endpoint.length() - 1];
+    if (lastchar == '0')
     {
         // client 1
-        cout << endl << "Notification " << self_in.endpoint << ": " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen;
+        cout << endl << "Notification " << self_in.endpoint << ": " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << "  ";
     }
     else
     {
-        cout << ".";
+        cout << "." << lastchar;
     }
 }
 
@@ -38,11 +40,7 @@ int main()
     {
         auto shell = make_shared<Shell>();
         pebo::errorCode err = shell->init(::notificationCB);
-        if (err)
-        {
-            cerr << "Could not initialize Shell, err: " << err << endl;
-            return err;
-        }
+        assert(err == errorCode::err_ok);
         testBench.addShell(shell);
 
         string endpoint = endpoint_base + to_string(i);
@@ -54,16 +52,12 @@ int main()
     for(auto i = clients.begin(); i != clients.end(); ++i)
     {
         pebo::errorCode err = i->get()->start();
-        if (err)
-        {
-            cerr << "Could not start client, err: " << err << endl;
-            return err;
-        }
+        assert(err == errorCode::err_ok);
     }
 
     cout << "Press Enter to exit ...";
     cin.get();
-    cout << endl;
+    cout << endl << "Stopping..." << endl;
 
     // stop clients
     for(auto i = clients.begin(); i != clients.end(); ++i)
