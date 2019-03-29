@@ -12,7 +12,8 @@ namespace pebo
     {
     public:
         SimulClient(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::Shell* shell_in, int num_in);
-        void start();
+        // also starts underlying shell
+        pebo::errorCode start();
         void stop();
 
     private:

@@ -21,7 +21,13 @@ pebo::errorCode pebo::init(pebo::service_t service_in, pebo::endpoint_t endpoint
     
     // create and init library
     pebo::Shell* shell_new = new pebo::Shell();
-    pebo::errorCode err = shell_new->init(service_in, endpoint_in, callback_in);
+    pebo::errorCode err = shell_new->init(callback_in);
+    if (err)
+    {
+        delete shell_new;
+        return err;
+    }
+    err = shell_new->start(service_in, endpoint_in);
     if (err)
     {
         delete shell_new;

@@ -20,7 +20,7 @@ Shell::~Shell()
     deinit();
 }
 
-errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in)
+errorCode Shell::init(NotificationCB callback_in)
 {
     // TODO thread-safe access to inited
     if (myInited)
@@ -31,8 +31,7 @@ errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, Notification
     assert(myCallback == nullptr);
     myInited = true;
 
-    // save client info
-    myPeer = PeerInfo { service_in, endpoint_in, 0 };  // TODO time
+    // callback
     myCallback = callback_in;
 
     // components: Store -- created upfront
@@ -49,8 +48,17 @@ errorCode Shell::init(service_t service_in, endpoint_t endpoint_in, Notification
     errorCode res = myPeboNet->init();
     if (res)
     {
+        myInited = false;
         return res;
     }
+
+    return errorCode::err_ok;
+}
+
+errorCode Shell::start(service_t service_in, endpoint_t endpoint_in)
+{
+    // save client info
+    myPeer = PeerInfo { service_in, endpoint_in, 0 };  // TODO time
 
     // broadcast this client to the net
     broadcast_refresh();

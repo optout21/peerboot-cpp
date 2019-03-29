@@ -19,9 +19,17 @@ void SimulClient::notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
     cout << "Notification: " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << endl;
 }
 
-void SimulClient::start()
+errorCode SimulClient::start()
 {
+    pebo::errorCode err = myShell->start(myService, myEndpoint);
+    if (err)
+    {
+        cerr << "Could not initialize Shell, err: " << err << " service: " << myService << " endpoint: " << myEndpoint << endl;
+        return err;
+    }
+
     myBgThread = move(thread([=]() { this->doBgThread(); return 1; }));
+    return errorCode::err_ok;
 }
 
 void SimulClient::stop()

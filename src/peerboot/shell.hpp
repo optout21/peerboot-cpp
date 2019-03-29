@@ -16,7 +16,8 @@ namespace pebo
     public:
         Shell();
         ~Shell();
-        errorCode init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in);
+        errorCode init(NotificationCB callback_in);
+        errorCode start(service_t service_in, endpoint_t endpoint_in);
         errorCode deinit();
         // Override methods for testing
         void setPeboNet(std::shared_ptr<IPeboNet> & peboNet_in);

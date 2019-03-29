@@ -24,18 +24,24 @@ int main()
     auto shell = make_shared<Shell>();
     shell->setPeboNet(testPeboNet);
     testPeboNet->setNotifyCB(shell.get());
-    pebo::errorCode err = shell->init(service, endpoint, ::notificationCB);
+    pebo::errorCode err = shell->init(::notificationCB);
     if (err)
     {
-        cerr << "Could not initialize PeerBoot library, err: " << err << " service: " << service << " endpoint: " << endpoint << endl;
+        cerr << "Could not initialize Shell, err: " << err << " service: " << service << " endpoint: " << endpoint << endl;
         return err;
     }
-    cout << "PeerBoot library initialized, service: " << service << " endpoint: " << endpoint << endl;
+    err = shell->start(service, endpoint);
+    if (err)
+    {
+        cerr << "Could not initialize Shell, err: " << err << " service: " << service << " endpoint: " << endpoint << endl;
+        return err;
+    }
+    cout << "Shell initialized, service: " << service << " endpoint: " << endpoint << endl;
 
     cout << "Press Enter to exit ...";
     cin.get();
     cout << endl;
 
     err = shell->deinit();
-    cout << "PeerBoot library deinitialized, err: " << err << endl;
+    cout << "Shell deinitialized, err: " << err << endl;
 }
