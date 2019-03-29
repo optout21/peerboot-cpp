@@ -28,5 +28,6 @@ namespace pebo
         // Broadcast peer info towards the network
         virtual errorCode broadcast(PeerInfo const & peer_in) = 0;
         virtual errorCode query(service_t service_in) = 0;
+        virtual std::string getNodeId() = 0;
     };
 }

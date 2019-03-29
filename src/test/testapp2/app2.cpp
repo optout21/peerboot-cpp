@@ -16,11 +16,11 @@ void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
     if (lastchar == '0')
     {
         // client 1
-        cout << endl << "Notification " << self_in.endpoint << ": " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << "  ";
+        cout << "Notification " << self_in.endpoint << ": " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << endl;
     }
     else
     {
-        cout << "." << lastchar;
+        //cout << "." << lastchar;
     }
 }
 
@@ -44,7 +44,7 @@ int main()
         testBench.addShell(shell);
 
         string endpoint = endpoint_base + to_string(i);
-        auto client = make_shared<SimulClient>(service, endpoint, shell.get(), i+1);
+        auto client = make_shared<SimulClient>(service, endpoint, shell.get(), (i <= 1), i+2, (i <= 1) ? 6 : 30);
         clients.push_back(client);
     }
     testBench.connect();

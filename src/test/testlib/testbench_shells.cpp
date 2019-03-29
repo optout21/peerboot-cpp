@@ -21,12 +21,7 @@ void TestBenchShells::connect()
             if (s1 != s2)
             {
                // connect s1 with s2, using a ConnectedClient
-               string id = "cp_" + to_string(s1) + "_" + to_string(s2);
-               auto peerPair = ConnectorPeer::createConnectedPair(id);
-               myShells[s1]->getPeboNet()->addPeer(id, peerPair.first);
-               peerPair.first->setNotifyCB(myShells[s1]->getPeboNet().get());
-               myShells[s2]->getPeboNet()->addPeer(id, peerPair.second);
-               peerPair.second->setNotifyCB(myShells[s2]->getPeboNet().get());
+               ConnectorPeer::connect2Nets(myShells[s1]->getPeboNet().get(), myShells[s2]->getPeboNet().get());
             }
         }
     }

@@ -11,22 +11,25 @@ namespace pebo
     class SimulClient
     {
     public:
-        SimulClient(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::Shell* shell_in, int num_in);
+        SimulClient(service_t service_in, endpoint_t endpoint_in, Shell* shell_in, bool verbose_in, int waitTime_in, int keepTime_in);
         // also starts underlying shell
-        pebo::errorCode start();
+        errorCode start();
         void stop();
 
     private:
-        static void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in);
-        void doBroadcast(bool removed_in);
+        static void notificationCB(PeerInfo self_in, PeerInfo peer_in);
+        errorCode doStart();
+        errorCode doStop();
         void doBgThread();
 
     private:
-        pebo::service_t myService;
-        pebo::endpoint_t myEndpoint;
-        pebo::Shell* myShell;
-        int myNum;
-        std::string myId;
+        service_t myService;
+        endpoint_t myEndpoint;
+        Shell* myShell;
+        bool myVerbose;
+        int myStartWait;
+        int myStartKeep;
+        std::string myNodeId;
         std::thread myBgThread;
         bool myBgThreadStop;
     };

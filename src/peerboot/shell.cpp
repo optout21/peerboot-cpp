@@ -77,6 +77,9 @@ errorCode Shell::stop()
     // broadcast good bye to the net
     broadcast_bye();
 
+    // clear store
+    myStore->clear();
+
     return errorCode::err_ok;
 }
 
