@@ -41,7 +41,7 @@ errorCode PeboNet::broadcast(PeerInfo const & peer_in)
     return doBroadcast(peer_in, myNodeId);
 }
 
-errorCode PeboNet::query(service_t service_in)
+errorCode PeboNet::queryRemote(service_t service_in)
 {
     return doBroadcastQuery(service_in, myNodeId);
 }

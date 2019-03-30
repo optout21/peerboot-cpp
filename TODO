@@ -1,7 +1,7 @@
 v0.1:
 - PeerBoot net peers connections
 - configured PB peers
-- NO peer propagation, no fixed well-known peers
+- NO PB peer propagation, no fixed well-known peers
 - connection from client
 - storage of peer info
 - propagation of peer info (send and receive)
@@ -10,3 +10,8 @@ v0.1:
 - TCP connections
 - NO UDP
 
+- Timestamp handling
+- Net messages, structured and serialized
+- Listen TCP, handle net messages
+- MsgStore, forward only once, handle only once
+- Forward query msg -- currently there is no limit on it, so it would go endless, PeboNet::queryFromPeboPeer

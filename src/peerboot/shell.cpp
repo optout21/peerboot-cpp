@@ -149,6 +149,6 @@ errorCode Shell::doNetQuery(service_t service_in)
 {
     // TODO thread safety
     assert(myPeboNet != nullptr);
-    errorCode res = myPeboNet->query(service_in);
+    errorCode res = myPeboNet->queryRemote(service_in);
     return res;
 }

@@ -19,7 +19,7 @@ namespace pebo
         errorCode deinit();
         errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in) { assert(false); };
         errorCode broadcast(PeerInfo const & peer_in);
-        errorCode query(service_t service_in) { assert(false); }
+        errorCode queryRemote(service_t service_in) { assert(false); }
         std::string getNodeId() { assert(false); };
         void notifyFromPeboPeer(std::string nodeId_in, PeerInfo peer_in) { assert(false); }
         void queryFromPeboPeer(std::string nodeId_in, service_t service_in) { assert(ffalse); }

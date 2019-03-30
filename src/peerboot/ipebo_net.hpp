@@ -27,7 +27,8 @@ namespace pebo
         virtual errorCode addPeer(std::string id_in, std::shared_ptr<IPeboPeer> const & peer_in) = 0;
         // Broadcast peer info towards the network
         virtual errorCode broadcast(PeerInfo const & peer_in) = 0;
-        virtual errorCode query(service_t service_in) = 0;
+        // Perform query from the peers, results will come asynchronously
+        virtual errorCode queryRemote(service_t service_in) = 0;
         virtual std::string getNodeId() = 0;
     };
 }
