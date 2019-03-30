@@ -1,4 +1,6 @@
 #include "store.hpp"
+#include "timestamp.hpp"
+
 #include <iostream>
 
 using namespace pebo;
@@ -29,7 +31,7 @@ IStore::updateResult_t Store::findAndUpdate(pebo::service_t service_in, pebo::en
     // TODO thread-safe !
     IStore::updateResult_t res = Store::updateResult_t::upd_invalid;
     // prepare new, if needed to add
-    timestamp_t now = 0; // TODO
+    timestamp_t now = TimeStamp::now();
     IStore::PeerInfo newPeer {
         service_in,
         endpoint_in,

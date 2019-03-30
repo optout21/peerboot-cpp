@@ -1,4 +1,6 @@
 #include "test_pebo_net.hpp"
+#include "../../peerboot/timestamp.hpp"
+
 #include <cassert>
 #include <iostream>
 #include <algorithm>
@@ -64,7 +66,7 @@ void TestPeboNet::addPeer()
 {
     string endpoint = "enpoint_";
     endpoint.append(to_string(myPeerCounter));
-    PeerInfo peer { myServiceName, endpoint, 0 };
+    PeerInfo peer { myServiceName, endpoint, TimeStamp::now(), false };
     ++myPeerCounter;
     myPeers.push_back(peer);
 

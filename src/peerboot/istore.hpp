@@ -19,7 +19,7 @@ namespace pebo
             pebo::service_t service;
             pebo::endpoint_t endpoint;
             pebo::timestamp_t addedTime;
-            pebo::timestamp_t lastSeenTime;
+            pebo::timestamp_t lastSeen;
             // TODO originating node
             bool isRemoved;
         };

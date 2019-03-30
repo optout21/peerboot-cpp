@@ -17,7 +17,7 @@ void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
     if (lastchar == '0')
     {
         // client 1
-        cout << "Notification " << self_in.endpoint << ": " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << endl;
+        cout << "Notification " << self_in.endpoint << ": " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << TimeStamp::age(peer_in.lastSeen) << endl;
     }
     else
     {

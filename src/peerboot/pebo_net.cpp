@@ -118,7 +118,7 @@ errorCode PeboNet::doQuery(std::string nodeId_in, service_t service_in)
     {
         // broadcast result to net.  Originator is myself
         //cerr << "QUERY res " << id_in << " " << i->endpoint << endl;
-        doBroadcast(pebo::PeerInfo { i->service, i->endpoint, i->lastSeenTime, i->isRemoved}, myNodeId);
+        doBroadcast(pebo::PeerInfo { i->service, i->endpoint, i->lastSeen, i->isRemoved}, myNodeId);
     }
     return errorCode::err_ok;
 }

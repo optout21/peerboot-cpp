@@ -1,6 +1,8 @@
 #include "shell.hpp"
 #include "pebo_net.hpp"
 #include "store.hpp"
+#include "timestamp.hpp"
+
 #include <cassert>
 #include <iostream>
 
@@ -61,7 +63,7 @@ errorCode Shell::init(NotificationCB callback_in)
 errorCode Shell::start(service_t service_in, endpoint_t endpoint_in)
 {
     // save client info
-    myPeer = PeerInfo { service_in, endpoint_in, 0 };  // TODO time
+    myPeer = PeerInfo { service_in, endpoint_in, TimeStamp::now() };  // TODO time
 
     // broadcast this client to the net
     broadcast_refresh();
