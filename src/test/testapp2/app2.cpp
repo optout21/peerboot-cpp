@@ -2,6 +2,7 @@
 #include "../../peerboot/shell.hpp"
 #include "../testlib/testbench_shells.hpp"
 #include "../testlib/simul_client.hpp"
+#include "../../peerboot/timestamp.hpp"
 #include <cassert>
 #include <iostream>
 #include <memory>
@@ -27,6 +28,7 @@ void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
 int main()
 {
     cout << "PeerBoot TestApp2, v" << PEBO_VERSION_MAJOR << "." << PEBO_VERSION_MINOR << endl;
+    cout << "Current time: " << TimeStamp::now() << endl;
 
     pebo::service_t service ("sample.peerboot.io");
     pebo::endpoint_t dummy_endpoint ("dummy_endpoint");

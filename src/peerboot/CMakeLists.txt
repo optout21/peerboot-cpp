@@ -6,6 +6,8 @@ add_library(libpeerboot
 	lib.cpp
 	pebo_net.cpp
 	pebo_net.hpp
+	timestamp.cpp
+	timestamp.cpp
 	shell.cpp
 	shell.hpp
 	store.cpp
