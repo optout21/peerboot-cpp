@@ -4,6 +4,8 @@ add_library(libpeerboot
 	ipebo_peer_cb.hpp
 	istore.hpp
 	lib.cpp
+	message.cpp
+	message.hpp
 	pebo_net.cpp
 	pebo_net.hpp
 	timestamp.cpp

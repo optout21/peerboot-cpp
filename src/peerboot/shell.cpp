@@ -63,7 +63,7 @@ errorCode Shell::init(NotificationCB callback_in)
 errorCode Shell::start(service_t service_in, endpoint_t endpoint_in)
 {
     // save client info
-    myPeer = PeerInfo { service_in, endpoint_in, TimeStamp::now() };  // TODO time
+    myPeer = PeerInfo { service_in, endpoint_in, TimeStamp::now() };
 
     // broadcast this client to the net
     broadcast_refresh();

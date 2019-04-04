@@ -38,18 +38,18 @@ errorCode PeboNet::addPeer(string nodeId_in, shared_ptr<IPeboPeer> const & peer_
 
 errorCode PeboNet::broadcast(PeerInfo const & peer_in)
 {
-    return doBroadcast(peer_in, myNodeId);
+    return doBroadcastPeer(PeerUpdateMessage(peer_in.service, peer_in.endpoint, peer_in.lastSeen, peer_in.isRemoved, 0), myNodeId);
 }
 
 errorCode PeboNet::queryRemote(service_t service_in)
 {
-    return doBroadcastQuery(service_in, myNodeId);
+    return doBroadcastQuery(QueryMessage(service_in, 0), myNodeId);
 }
 
-void PeboNet::notifyFromPeboPeer(string nodeId_in, PeerInfo peer_in)
+void PeboNet::notifyFromPeboPeer(string nodeId_in, PeerUpdateMessage const & msg_in)
 {
     //cerr << "PeboNet::notifyFromPeboPeer " << myId << " from " << id_in << " " << peer_in.endpoint << endl;
-    IStore::updateResult_t updateRes = myStore->findAndUpdate(peer_in.service, peer_in.endpoint, peer_in.isRemoved);
+    IStore::updateResult_t updateRes = myStore->findAndUpdate(msg_in.getService(), msg_in.getEndpoint(), msg_in.getIsRemoved());
     if (updateRes == IStore::updateResult_t::upd_updatedOnlyTime ||
         updateRes == IStore::updateResult_t::upd_noChangeNeeded)
     {
@@ -57,48 +57,69 @@ void PeboNet::notifyFromPeboPeer(string nodeId_in, PeerInfo peer_in)
     }
     else
     {
+        PeerInfo peer { msg_in.getService(), msg_in.getEndpoint(), msg_in.getLastSeen(), msg_in.getIsRemoved() };
         // peer info added or updated, forward it
-        doClientCallback(peer_in);
-        doBroadcast(peer_in, nodeId_in);
+        doClientCallback(peer);
+        doBroadcastPeer(msg_in, nodeId_in);
     }
 }
 
-void PeboNet::queryFromPeboPeer(std::string nodeId_in, service_t service_in)
+void PeboNet::queryFromPeboPeer(std::string nodeId_in, QueryMessage const & msg_in)
 {
     // TODO DO not forward query, there is no limit on it
-    //doBroadcastQuery(service_in, nodeId_in);
+    //doBroadcastQuery(msg_in, nodeId_in);
 
     //cerr << "PeboNet::queryFromPeboPeer " << myId << " " << service_in << endl;
-    doQuery(nodeId_in, service_in);
+    doQuery(nodeId_in, msg_in.getService());
 }
 
-errorCode PeboNet::doBroadcast(PeerInfo const & peer_in, string originatorNode)
+void PeboNet::msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in)
 {
-    //cerr << "PeboNet::doBroadcast " << myNetPeers.size() << endl;
+    switch(msg_in.getType())
+    {
+        case messageType::PeerUpdate:
+            notifyFromPeboPeer(nodeId_in, dynamic_cast<PeerUpdateMessage const &>(msg_in));
+            break;
+
+        case messageType::Query:
+            queryFromPeboPeer(nodeId_in, dynamic_cast<QueryMessage const &>(msg_in));
+            break;
+
+        case messageType::invalid:
+        default:
+            // invalid message type
+            assert (msg_in.getType() == messageType::PeerUpdate);
+            break;
+    }
+}
+
+errorCode PeboNet::doBroadcastPeer(PeerUpdateMessage const & msg_in, string originatorNodeId)
+{
+    //cerr << "PeboNet::doBroadcastPeer " << myNetPeers.size() << endl;
     // TODO threadsafety
     for(auto i = myNetPeers.begin(); i != myNetPeers.end(); ++i)
     {
         // skip originator
-        //cerr << "PeboNet::doBroadcast " << originatorNode << " " << i->nodeId << endl;
-        if (i->nodeId != originatorNode)
+        //cerr << "PeboNet::doBroadcastPeer " << originatorNodeId << " " << i->nodeId << endl;
+        if (i->nodeId != originatorNodeId)
         {
-            i->peer->send(peer_in);
+            i->peer->sendMsg(msg_in);
         }
     }
     return errorCode::err_ok;
 }
 
-errorCode PeboNet::doBroadcastQuery(service_t service_in, string originatorNode)
+errorCode PeboNet::doBroadcastQuery(QueryMessage const & msg_in, string originatorNodeId)
 {
     //cerr << "PeboNet::doBroadcastQuery " << myNetPeers.size() << endl;
     // TODO threadsafety
     for(auto i = myNetPeers.begin(); i != myNetPeers.end(); ++i)
     {
         // skip originator
-        //cerr << "PeboNet::doBroadcastQuery " << originatorNode << " " << i->nodeId << endl;
-        if (i->nodeId != originatorNode)
+        //cerr << "PeboNet::doBroadcastQuery " << originatorNodeId << " " << i->nodeId << endl;
+        if (i->nodeId != originatorNodeId)
         {
-            i->peer->query(service_in);
+            i->peer->sendMsg(msg_in);
         }
     }
     return errorCode::err_ok;
@@ -118,7 +139,7 @@ errorCode PeboNet::doQuery(std::string nodeId_in, service_t service_in)
     {
         // broadcast result to net.  Originator is myself
         //cerr << "QUERY res " << id_in << " " << i->endpoint << endl;
-        doBroadcast(pebo::PeerInfo { i->service, i->endpoint, i->lastSeen, i->isRemoved}, myNodeId);
+        doBroadcastPeer(PeerUpdateMessage(i->service, i->endpoint, i->lastSeen, i->isRemoved, 0), myNodeId);
     }
     return errorCode::err_ok;
 }

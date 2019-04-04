@@ -19,8 +19,8 @@ set_target_properties(testapp2
 
 # link with our library, and default platform libraries
 target_link_libraries(testapp2
-	libpeerboot
     libpbtest
+	libpeerboot
 	${PLATFORM_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
 )

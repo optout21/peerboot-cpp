@@ -21,8 +21,7 @@ namespace pebo
         errorCode broadcast(PeerInfo const & peer_in);
         errorCode queryRemote(service_t service_in) { assert(false); }
         std::string getNodeId() { assert(false); };
-        void notifyFromPeboPeer(std::string nodeId_in, PeerInfo peer_in) { assert(false); }
-        void queryFromPeboPeer(std::string nodeId_in, service_t service_in) { assert(ffalse); }
+        void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in) { assert(false); }
 
     private:
         errorCode doClientCallback(PeerInfo const & peer_in);

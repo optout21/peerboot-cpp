@@ -1,6 +1,7 @@
 #pragma once
 #include "../include/peerboot.hpp"
 #include "ipebo_peer_cb.hpp"
+#include "message.hpp"
 
 namespace pebo
 {
@@ -11,9 +12,7 @@ namespace pebo
     {
     public:
         virtual void setNotifyCB(IPeboPeerCB* peboPeerCB_in) = 0;
-        // Send a peer info towards this peer
-        virtual errorCode send(PeerInfo const & peer_in) = 0;
-        // Send a query request to this peer, results will come later asynchronously as peer updates
-        virtual errorCode query(service_t service_in) = 0;
+        // Send a message to this peer
+        virtual errorCode sendMsg(BaseMessage const & msg_in) = 0;
     };
 }

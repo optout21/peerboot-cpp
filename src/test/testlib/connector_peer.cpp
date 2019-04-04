@@ -45,32 +45,15 @@ void ConnectorPeer::setNotifyCB(IPeboPeerCB* peboPeerCB_in)
     myPeboPeerCB = peboPeerCB_in;
 }
 
-errorCode ConnectorPeer::send(PeerInfo const & peer_in)
-{
-    //cerr << "ConnectorPeer::send " << myId << " " << peer_in.endpoint << endl;
-    // pass it to our peer
-    assert(myPeer != nullptr);
-    myPeer->doNetSendCallback(peer_in);
-    return errorCode::err_ok;
-}
-
-errorCode ConnectorPeer::query(service_t service_in)
+errorCode ConnectorPeer::sendMsg(BaseMessage const & msg_in)
 {
     // pass it to our peer
     assert(myPeer != nullptr);
-    myPeer->doNetQueryCallback(service_in);
-    return errorCode::err_ok;
+    myPeer->messageFromNet(msg_in);
 }
 
-void ConnectorPeer::doNetSendCallback(PeerInfo const & peer_in)
-{
-    //cerr << "ConnectorPeer::doNetSendCallback " << myId << " " << peer_in.endpoint << endl;
-    assert(myPeboPeerCB != nullptr);
-    myPeboPeerCB->notifyFromPeboPeer(myId, peer_in);
-}
-
-void ConnectorPeer::doNetQueryCallback(service_t service_in)
+void ConnectorPeer::messageFromNet(BaseMessage const & msg_in)
 {
     assert(myPeboPeerCB != nullptr);
-    myPeboPeerCB->queryFromPeboPeer(myId, service_in);
+    myPeboPeerCB->msgFromPeboPeer(myId, msg_in);
 }

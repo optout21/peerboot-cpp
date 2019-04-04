@@ -1,6 +1,7 @@
 #pragma once
 #include "ipebo_net.hpp"
 #include "ipebo_peer.hpp"
+#include "message.hpp"
 #include "store.hpp"
 #include <memory>
 #include <vector>
@@ -28,12 +29,14 @@ namespace pebo
         errorCode broadcast(PeerInfo const & peer_in);
         errorCode queryRemote(service_t service_in);
         std::string getNodeId() { return myNodeId; };
-        void notifyFromPeboPeer(std::string nodeId_in, PeerInfo peer_in);
-        void queryFromPeboPeer(std::string nodeId_in, service_t service_in);
+        // A message received from the peer
+        void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in);
 
     private:
-        errorCode doBroadcast(PeerInfo const & peer_in, std::string originatorNode);
-        errorCode doBroadcastQuery(service_t service_in, std::string originatorNode);
+        void notifyFromPeboPeer(std::string nodeId_in, PeerUpdateMessage const & msg_in);
+        void queryFromPeboPeer(std::string nodeId_in, QueryMessage const & msg_in);
+        errorCode doBroadcastPeer(PeerUpdateMessage const & msg_in, std::string originatorNodeId);
+        errorCode doBroadcastQuery(QueryMessage const & msg_in, std::string originatorNodeId);
         errorCode doQuery(std::string nodeId_in, service_t service_in);
         errorCode doClientCallback(PeerInfo const & peer_in);
 

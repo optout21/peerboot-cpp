@@ -28,7 +28,6 @@ void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
 int main()
 {
     cout << "PeerBoot TestApp2, v" << PEBO_VERSION_MAJOR << "." << PEBO_VERSION_MINOR << endl;
-    cout << "Current time: " << TimeStamp::now() << endl;
 
     pebo::service_t service ("sample.peerboot.io");
     pebo::endpoint_t dummy_endpoint ("dummy_endpoint");

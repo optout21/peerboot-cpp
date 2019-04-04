@@ -1,5 +1,6 @@
 #pragma once
 #include "../include/peerboot.hpp"
+#include "message.hpp"
 
 namespace pebo
 {
@@ -9,7 +10,7 @@ namespace pebo
     class IPeboPeerCB
     {
     public:
-        virtual void notifyFromPeboPeer(std::string id_in, PeerInfo peer_in) = 0;
-        virtual void queryFromPeboPeer(std::string id_in, service_t service_in) = 0;
+        // A message received from the peer
+        virtual void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in) = 0;
     };
 }
