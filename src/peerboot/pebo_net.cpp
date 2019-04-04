@@ -82,8 +82,12 @@ void PeboNet::msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in)
 errorCode PeboNet::doBroadcastMsg(BaseMessage const & msg_in, string originatorNodeId)
 {
     //cerr << "PeboNet::doBroadcastMsg " << myNetPeers.size() << endl;
-    lock_guard<recursive_mutex> lock(myNetPeersMutex);
-    for(auto i = myNetPeers.begin(); i != myNetPeers.end(); ++i)
+    std::vector<PeerWithId> netPeersCopy;
+    { // lock scope
+        lock_guard<recursive_mutex> lock(myNetPeersMutex);
+        netPeersCopy = myNetPeers;
+    }
+    for(auto i = netPeersCopy.begin(); i != netPeersCopy.end(); ++i)
     {
         // skip originator
         //cerr << "PeboNet::doBroadcastMsg " << originatorNodeId << " " << i->nodeId << endl;
