@@ -5,23 +5,27 @@
 #include "../include/peerboot.hpp"
 #include "shell.hpp"
 #include <cassert>
+#include <mutex>
+
+using namespace pebo;
 
 // Global single shell object
-pebo::Shell* global_instance = nullptr;
+Shell* global_instance = nullptr;
+std::mutex global_init_mutex;
 
-pebo::errorCode pebo::init(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::NotificationCB callback_in)
+errorCode pebo::init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in)
 {
-    // TODO: thread-safe access to global instance
+    std::lock_guard<std::mutex> lock(global_init_mutex);
     if (::global_instance != nullptr)
     {
         // already initialized
-        return pebo::errorCode::err_libAlreadyInited;
+        return errorCode::err_libAlreadyInited;
     }
     assert (::global_instance == nullptr);
     
     // create and init library
-    pebo::Shell* shell_new = new pebo::Shell();
-    pebo::errorCode err = shell_new->init(callback_in);
+    Shell* shell_new = new Shell();
+    errorCode err = shell_new->init(callback_in);
     if (err)
     {
         delete shell_new;
@@ -36,23 +40,24 @@ pebo::errorCode pebo::init(pebo::service_t service_in, pebo::endpoint_t endpoint
     // save it
     ::global_instance = shell_new;
 
-    return pebo::errorCode::err_ok;
+    return errorCode::err_ok;
 }
 
-pebo::errorCode pebo::deinit()
+errorCode pebo::deinit()
 {
+    std::lock_guard<std::mutex> lock(global_init_mutex);
     if (::global_instance == nullptr)
     {
         // no lib, nothing to do
-        return pebo::errorCode::err_libNotInited;
+        return errorCode::err_libNotInited;
     }
     assert(::global_instance != nullptr);
 
-    pebo::Shell* shell_old = ::global_instance;
+    Shell* shell_old = ::global_instance;
     ::global_instance = nullptr;
 
     // deinit lib
-    pebo::errorCode err = shell_old->deinit();
+    errorCode err = shell_old->deinit();
     delete shell_old;
 
     return err;

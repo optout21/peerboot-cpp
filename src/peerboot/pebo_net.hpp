@@ -4,6 +4,7 @@
 #include "message.hpp"
 #include "store.hpp"
 #include <memory>
+#include <mutex>
 #include <vector>
 
 namespace pebo
@@ -44,6 +45,7 @@ namespace pebo
         std::string myNodeId;
         IPeboNetCB* myPeboNetCB;
         std::vector<PeerWithId> myNetPeers;
+        std::recursive_mutex myNetPeersMutex;
         IStore* myStore;
 
         class MessageFromPeerVisitor: public MessageVisitorBase

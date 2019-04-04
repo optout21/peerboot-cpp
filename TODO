@@ -12,7 +12,6 @@ v0.1:
 
 - Serialization/deserialization of messages
 - Listen TCP, handle net messages
-- locking, thread safety
 - MsgStore, forward only once, handle only once
 - replacable time source, for testing
 - Forward query msg -- currently there is no limit on it, so it would go endless, PeboNet::queryFromPeboPeer

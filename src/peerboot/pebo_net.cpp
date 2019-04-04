@@ -31,7 +31,7 @@ errorCode PeboNet::deinit()
 
 errorCode PeboNet::addPeer(string nodeId_in, shared_ptr<IPeboPeer> const & peer_in)
 {
-    // TODO threadsafety
+    lock_guard<recursive_mutex> lock(myNetPeersMutex);
     myNetPeers.push_back(PeerWithId { nodeId_in, peer_in });
     //cerr << "PeboNet::addPeer " << nodeId_in << " " << myNetPeers.size() << endl;
 }
@@ -82,7 +82,7 @@ void PeboNet::msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in)
 errorCode PeboNet::doBroadcastPeer(PeerUpdateMessage const & msg_in, string originatorNodeId)
 {
     //cerr << "PeboNet::doBroadcastPeer " << myNetPeers.size() << endl;
-    // TODO threadsafety
+    lock_guard<recursive_mutex> lock(myNetPeersMutex);
     for(auto i = myNetPeers.begin(); i != myNetPeers.end(); ++i)
     {
         // skip originator
@@ -98,7 +98,7 @@ errorCode PeboNet::doBroadcastPeer(PeerUpdateMessage const & msg_in, string orig
 errorCode PeboNet::doBroadcastQuery(QueryMessage const & msg_in, string originatorNodeId)
 {
     //cerr << "PeboNet::doBroadcastQuery " << myNetPeers.size() << endl;
-    // TODO threadsafety
+    lock_guard<recursive_mutex> lock(myNetPeersMutex);
     for(auto i = myNetPeers.begin(); i != myNetPeers.end(); ++i)
     {
         // skip originator
