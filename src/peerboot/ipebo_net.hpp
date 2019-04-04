@@ -22,9 +22,9 @@ namespace pebo
     {
     public:
         virtual void setNotifyCB(IPeboNetCB* peboNetCB_in) = 0;
-        virtual errorCode init(std::string id_in) = 0;
+        virtual errorCode init(std::string nodeId_in) = 0;
         virtual errorCode deinit() = 0;
-        virtual errorCode addPeer(std::string id_in, std::shared_ptr<IPeboPeer> const & peer_in) = 0;
+        virtual errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in) = 0;
         // Broadcast peer info towards the network
         virtual errorCode broadcast(PeerInfo const & peer_in) = 0;
         // Perform query from the peers, results will come asynchronously

@@ -33,7 +33,7 @@ errorCode PeboNet::addPeer(string nodeId_in, shared_ptr<IPeboPeer> const & peer_
 {
     // TODO threadsafety
     myNetPeers.push_back(PeerWithId { nodeId_in, peer_in });
-    //cerr << "PeboNet::addPeer " << id_in << " " << myNetPeers.size() << endl;
+    //cerr << "PeboNet::addPeer " << nodeId_in << " " << myNetPeers.size() << endl;
 }
 
 errorCode PeboNet::broadcast(PeerInfo const & peer_in)
@@ -48,7 +48,7 @@ errorCode PeboNet::queryRemote(service_t service_in)
 
 void PeboNet::peerUpdateFromPeboPeer(string nodeId_in, PeerUpdateMessage const & msg_in)
 {
-    //cerr << "PeboNet::peerUpdateFromPeboPeer " << myId << " from " << id_in << " " << peer_in.endpoint << endl;
+    //cerr << "PeboNet::peerUpdateFromPeboPeer " << myNodeId << " from " << nodeId_in << " " << peer_in.endpoint << endl;
     IStore::updateResult_t updateRes = myStore->findAndUpdate(msg_in.getService(), msg_in.getEndpoint(), msg_in.getIsRemoved());
     if (updateRes == IStore::updateResult_t::upd_updatedOnlyTime ||
         updateRes == IStore::updateResult_t::upd_noChangeNeeded)
@@ -69,7 +69,7 @@ void PeboNet::queryFromPeboPeer(std::string nodeId_in, QueryMessage const & msg_
     // TODO DO not forward query, there is no limit on it
     //doBroadcastQuery(msg_in, nodeId_in);
 
-    //cerr << "PeboNet::queryFromPeboPeer " << myId << " " << service_in << endl;
+    //cerr << "PeboNet::queryFromPeboPeer " << myNodeId << " " << service_in << endl;
     doQuery(nodeId_in, msg_in.getService());
 }
 
@@ -120,11 +120,11 @@ errorCode PeboNet::doQuery(std::string nodeId_in, service_t service_in)
         // no results
         return errorCode::err_ok;
     }
-    //cerr << "QUERY " << id_in << " " << result.size() << endl;
+    //cerr << "QUERY " << nodeId_in << " " << result.size() << endl;
     for(auto i = result.cbegin(); i != result.cend(); ++i)
     {
         // broadcast result to net.  Originator is myself
-        //cerr << "QUERY res " << id_in << " " << i->endpoint << endl;
+        //cerr << "QUERY res " << nodeId_in << " " << i->endpoint << endl;
         doBroadcastPeer(PeerUpdateMessage(i->service, i->endpoint, i->lastSeen, i->isRemoved, 0), myNodeId);
     }
     return errorCode::err_ok;

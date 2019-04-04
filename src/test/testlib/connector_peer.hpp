@@ -11,7 +11,7 @@ namespace pebo
     class ConnectorPeer: public IPeboPeer
     {
     protected:
-        ConnectorPeer(std::string id_in);
+        ConnectorPeer(std::string nodeId_in);
 
     public:
         static std::pair<std::shared_ptr<ConnectorPeer>, std::shared_ptr<ConnectorPeer>> createConnectedPair(std::string id1_in, std::string id2_in);
@@ -26,7 +26,7 @@ namespace pebo
 
     private:
         IPeboPeerCB* myPeboPeerCB;
-        std::string myId;
+        std::string myNodeId;
         ConnectorPeer* myPeer;
     };
 }

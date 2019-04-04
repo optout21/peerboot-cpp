@@ -5,8 +5,8 @@
 using namespace pebo;
 using namespace std;
 
-ConnectorPeer::ConnectorPeer(std::string id_in) :
-myId(id_in)
+ConnectorPeer::ConnectorPeer(std::string nodeId_in) :
+myNodeId(nodeId_in)
 {
 }
 
@@ -37,7 +37,7 @@ void ConnectorPeer::setPeer(ConnectorPeer* peer_in)
 {
     assert(myPeer == nullptr);
     myPeer = peer_in;
-    // TODO myId = peer_in->
+    // TODO myNodeId = peer_in->
 }
 
 void ConnectorPeer::setNotifyCB(IPeboPeerCB* peboPeerCB_in)
@@ -55,5 +55,5 @@ errorCode ConnectorPeer::sendMsg(BaseMessage const & msg_in)
 void ConnectorPeer::messageFromNet(BaseMessage const & msg_in)
 {
     assert(myPeboPeerCB != nullptr);
-    myPeboPeerCB->msgFromPeboPeer(myId, msg_in);
+    myPeboPeerCB->msgFromPeboPeer(myNodeId, msg_in);
 }
