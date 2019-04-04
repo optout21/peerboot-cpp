@@ -36,8 +36,7 @@ namespace pebo
     private:
         void peerUpdateFromPeboPeer(std::string nodeId_in, PeerUpdateMessage const & msg_in);
         void queryFromPeboPeer(std::string nodeId_in, QueryMessage const & msg_in);
-        errorCode doBroadcastPeer(PeerUpdateMessage const & msg_in, std::string originatorNodeId);
-        errorCode doBroadcastQuery(QueryMessage const & msg_in, std::string originatorNodeId);
+        errorCode doBroadcastMsg(BaseMessage const & msg_in, std::string originatorNodeId);
         errorCode doQuery(std::string nodeId_in, service_t service_in);
         errorCode doClientCallback(PeerInfo const & peer_in);
 
