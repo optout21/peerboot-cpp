@@ -27,6 +27,7 @@ void ConnectorPeer::connect2Nets(IPeboNet* net1_in, IPeboNet* net2_in)
     auto id1 = net1_in->getNodeId();
     auto id2 = net2_in->getNodeId();
     auto peerPair = createConnectedPair(id1, id2);
+    // cross connect
     net1_in->addPeer(id2, peerPair.first);
     peerPair.first->setNotifyCB(net1_in);
     net2_in->addPeer(id1, peerPair.second);
@@ -37,7 +38,6 @@ void ConnectorPeer::setPeer(ConnectorPeer* peer_in)
 {
     assert(myPeer == nullptr);
     myPeer = peer_in;
-    // TODO myNodeId = peer_in->
 }
 
 void ConnectorPeer::setNotifyCB(IPeboPeerCB* peboPeerCB_in)

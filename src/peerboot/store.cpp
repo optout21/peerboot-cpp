@@ -8,7 +8,7 @@ using namespace std;
 
 bool Store::findPeer(service_t service_in, endpoint_t endpoint_in, PeerInfo & peerInfo_inout)
 {
-    // TODO thread-safety !
+    // thread-safety: private, from outside
     // check service
     if (myStore.find(service_in) == myStore.end())
     {
@@ -28,7 +28,7 @@ bool Store::findPeer(service_t service_in, endpoint_t endpoint_in, PeerInfo & pe
 
 IStore::updateResult_t Store::findAndUpdate(pebo::service_t service_in, pebo::endpoint_t endpoint_in, bool isRemoved_in)
 {
-    // TODO thread-safe !
+    lock_guard<mutex> lock(myMutex);
     IStore::updateResult_t res = Store::updateResult_t::upd_invalid;
     // prepare new, if needed to add
     timestamp_t now = TimeStamp::now();
@@ -62,7 +62,7 @@ IStore::updateResult_t Store::findAndUpdate(pebo::service_t service_in, pebo::en
 
 void Store::addPeer(IStore::PeerInfo peer_in)
 {
-    // TODO thread-safety
+    // thread-safety: private, from outside
     // check service, add if needed
     if (myStore.find(peer_in.service) == myStore.end())
     {
@@ -76,8 +76,8 @@ void Store::addPeer(IStore::PeerInfo peer_in)
 
 long Store::count() const
 {
+    lock_guard<mutex> lock(myMutex);
     long c = 0;
-    // TODO thread safety
     for(auto s = myStore.cbegin(); s != myStore.cend(); ++s)
     {
         c += (*s).second.size();
@@ -87,8 +87,8 @@ long Store::count() const
 
 vector<IStore::PeerInfo> Store::query(service_t service_in) const
 {
+    lock_guard<mutex> lock(myMutex);
     vector<IStore::PeerInfo> result;
-    // TODO thread safety
     auto endpoints = myStore.find(service_in);
     if (endpoints == myStore.end())
     {
@@ -104,13 +104,14 @@ vector<IStore::PeerInfo> Store::query(service_t service_in) const
 
 void Store::clear()
 {
+    lock_guard<mutex> lock(myMutex);
     myStore.clear();
 }
 
 long Store::countNonremoved() const
 {
+    // thread-safety: private, from outside
     long c = 0;
-    // TODO thread safety
     for(auto s = myStore.cbegin(); s != myStore.cend(); ++s)
     {
         for(auto e = s->second.cbegin(); e != s->second.cend(); ++e)
