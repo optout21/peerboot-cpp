@@ -11,8 +11,10 @@ v0.1:
 - NO UDP
 
 - Serialization/deserialization of messages
-- visitor for message types
 - Listen TCP, handle net messages
 - MsgStore, forward only once, handle only once
 - replacable time source, for testing
 - Forward query msg -- currently there is no limit on it, so it would go endless, PeboNet::queryFromPeboPeer
+- auto build, compile
+- unit test
+- auto build, test

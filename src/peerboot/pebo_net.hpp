@@ -33,7 +33,7 @@ namespace pebo
         void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in);
 
     private:
-        void notifyFromPeboPeer(std::string nodeId_in, PeerUpdateMessage const & msg_in);
+        void peerUpdateFromPeboPeer(std::string nodeId_in, PeerUpdateMessage const & msg_in);
         void queryFromPeboPeer(std::string nodeId_in, QueryMessage const & msg_in);
         errorCode doBroadcastPeer(PeerUpdateMessage const & msg_in, std::string originatorNodeId);
         errorCode doBroadcastQuery(QueryMessage const & msg_in, std::string originatorNodeId);
@@ -45,5 +45,19 @@ namespace pebo
         IPeboNetCB* myPeboNetCB;
         std::vector<PeerWithId> myNetPeers;
         IStore* myStore;
+
+        class MessageFromPeerVisitor: public MessageVisitorBase
+        {
+        public:
+            MessageFromPeerVisitor(PeboNet & net_in, std::string nodeId_in) :
+                MessageVisitorBase(), myNet(net_in), myNodeId(nodeId_in) { }
+            virtual ~MessageFromPeerVisitor() = default;
+            void peerUpdate(PeerUpdateMessage const & msg_in) { myNet.peerUpdateFromPeboPeer(myNodeId, msg_in); }
+            void query(QueryMessage const & msg_in) { myNet.queryFromPeboPeer(myNodeId, msg_in); }
+
+        private:
+            PeboNet & myNet;
+            std::string myNodeId;
+        };
     };
 }

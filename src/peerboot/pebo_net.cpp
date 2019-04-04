@@ -46,9 +46,9 @@ errorCode PeboNet::queryRemote(service_t service_in)
     return doBroadcastQuery(QueryMessage(service_in, 0), myNodeId);
 }
 
-void PeboNet::notifyFromPeboPeer(string nodeId_in, PeerUpdateMessage const & msg_in)
+void PeboNet::peerUpdateFromPeboPeer(string nodeId_in, PeerUpdateMessage const & msg_in)
 {
-    //cerr << "PeboNet::notifyFromPeboPeer " << myId << " from " << id_in << " " << peer_in.endpoint << endl;
+    //cerr << "PeboNet::peerUpdateFromPeboPeer " << myId << " from " << id_in << " " << peer_in.endpoint << endl;
     IStore::updateResult_t updateRes = myStore->findAndUpdate(msg_in.getService(), msg_in.getEndpoint(), msg_in.getIsRemoved());
     if (updateRes == IStore::updateResult_t::upd_updatedOnlyTime ||
         updateRes == IStore::updateResult_t::upd_noChangeNeeded)
@@ -75,22 +75,8 @@ void PeboNet::queryFromPeboPeer(std::string nodeId_in, QueryMessage const & msg_
 
 void PeboNet::msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in)
 {
-    switch(msg_in.getType())
-    {
-        case messageType::PeerUpdate:
-            notifyFromPeboPeer(nodeId_in, dynamic_cast<PeerUpdateMessage const &>(msg_in));
-            break;
-
-        case messageType::Query:
-            queryFromPeboPeer(nodeId_in, dynamic_cast<QueryMessage const &>(msg_in));
-            break;
-
-        case messageType::invalid:
-        default:
-            // invalid message type
-            assert (msg_in.getType() == messageType::PeerUpdate);
-            break;
-    }
+   MessageFromPeerVisitor visitor(*this, nodeId_in);
+   msg_in.visit(visitor);
 }
 
 errorCode PeboNet::doBroadcastPeer(PeerUpdateMessage const & msg_in, string originatorNodeId)
