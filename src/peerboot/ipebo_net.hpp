@@ -31,7 +31,7 @@ namespace pebo
         virtual errorCode broadcast(PeerInfo const & peer_in) = 0;
         // Perform query from the peers, results will come asynchronously
         virtual errorCode queryRemote(service_t service_in) = 0;
-        virtual std::string getNodeId() = 0;
-        virtual void setNodeId(std::string const & nodeId_in) = 0;
+        //virtual std::string getNodeId() = 0;
+        //virtual void setNodeId(std::string const & nodeId_in) = 0;
     };
 }

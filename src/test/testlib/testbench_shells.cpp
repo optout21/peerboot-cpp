@@ -6,22 +6,26 @@
 using namespace pebo;
 using namespace std;
 
+
+long TestBenchShells::myCounter = 0;
+
 void TestBenchShells::addShell(shared_ptr<Shell> shell_in)
 {
-    myShells.push_back(shell_in);
+    string id = "testnode" + to_string(++myCounter);
+    myShells[id] = shell_in;
 }
 
 void TestBenchShells::connect()
 {
     // connect pair-wise
-    for(auto s1 = 0; s1 < myShells.size(); ++s1)
+    for(auto s1 = myShells.begin(); s1 != myShells.end(); ++s1)
     {
-        for(auto s2 = s1 + 1; s2 < myShells.size(); ++s2)
+        for(auto s2 = myShells.begin(); s2 != myShells.end(); ++s2)
         {
             if (s1 != s2)
             {
                // connect s1 with s2, using a ConnectedClient
-               ConnectorPeer::connect2Nets(myShells[s1]->getPeboNet().get(), myShells[s2]->getPeboNet().get());
+               ConnectorPeer::connect2Nets(s1->second->getPeboNet().get(), s2->second->getPeboNet().get(), s1->first, s2->first);
             }
         }
     }
@@ -30,8 +34,8 @@ void TestBenchShells::connect()
 void TestBenchShells::deinit()
 {
     // connect pair-wise
-    for(auto i = 0; i < myShells.size(); ++i)
+    for(auto s = myShells.begin(); s != myShells.end(); ++s)
     {
-        myShells[i]->deinit();
+        s->second->deinit();
     }
 }
