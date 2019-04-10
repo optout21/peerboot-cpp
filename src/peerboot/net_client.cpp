@@ -123,7 +123,6 @@ void SendMessageVisitor::peerUpdate(PeerUpdateMessage const & msg_in)
 
 void SendMessageVisitor::query(QueryMessage const & msg_in)
 {
-    cerr << "SendMessageVisitor::query " << msg_in.getService() << endl;
     myMessage = "QUERY " + msg_in.getService();
 }
 
