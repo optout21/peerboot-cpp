@@ -1,9 +1,7 @@
 #include "../../include/peerboot.hpp"
 #include <iostream>
-#include <sstream>
-#include <thread>
+#include <ctime>
 
-using namespace pebo;
 using namespace std;
 
 void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
@@ -11,14 +9,25 @@ void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
     cout << "Notification: " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << endl;
 }
 
+// Generate endpoint suffix baed on current time
+string getEndpointSuffix()
+{
+    std::string suffix;
+    // get current time
+    std::time_t t = std::time(0);
+    std::tm* nowtm = std::localtime(&t);
+    string asctime = std::asctime(nowtm);
+    if (asctime.length() >= 19) suffix = asctime.substr(11, 8); // HH:MM:SS
+    return suffix;
+}
+
 int main()
 {
     cout << "Sample PeerBoot Client, v" << PEBO_VERSION_MAJOR << "." << PEBO_VERSION_MINOR << endl;
 
     pebo::service_t service ("sample.peerboot.io");
-    ostringstream threadid;
-    threadid << this_thread::get_id();
-    pebo::endpoint_t endpoint ("dummy_endpoint_" + threadid.str());
+    pebo::endpoint_t endpoint ("dummy_endpoint_" + getEndpointSuffix());
+
     pebo::errorCode err = pebo::init(service, endpoint, ::notificationCB);
     if (err)
     {
