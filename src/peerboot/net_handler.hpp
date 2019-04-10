@@ -22,7 +22,6 @@ namespace pebo
         // returns the used port, or <0 for error
         int doListen(int port_in, int tryNextPorts_in);
         int doBgThread();
-        static std::string getHostIp();
 
     private:
         std::shared_ptr<IPeboNet> myPeboNet;

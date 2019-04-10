@@ -28,10 +28,6 @@ errorCode NetHandler::start(int port_in, int tryNextPorts_in)
         return errorCode::err_networkListen;
     }
 
-    // we don't know our external endpoint, use value with local hostname and port
-    string nodeId = getHostIp() + ":" + to_string(actualPort);
-    myPeboNet->setNodeId(nodeId);
-
     // outgoing clients, predefined, TODO
     for (int p = 5001; p <= 5005; ++p)
     {
@@ -145,24 +141,4 @@ int NetHandler::doBgThread()
     }
 
     return 0;
-}
-
-string NetHandler::getHostIp()
-{
-    string ip = "LOCAL";
-    char hostname[256];
-    if (::gethostname(hostname, sizeof(hostname)) != 0) return ip;
-    struct hostent* hostent = ::gethostbyname(hostname);
-    if (hostent->h_length <= 0) return ip;
-    //if (hostent->h_addr_list[0] == 0) return ip;
-    for (int i = 0; i < hostent->h_length; ++i)
-    {
-        char ipStr[256];
-        if (::inet_ntop(hostent->h_addrtype, hostent->h_addr_list[i], ipStr, 256) != NULL)
-        {
-            ip = ipStr;
-            break;
-        }
-    }
-    return ip;
 }
