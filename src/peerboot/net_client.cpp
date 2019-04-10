@@ -76,6 +76,12 @@ errorCode NetClientIn::doProcessIncomingMessage()
                 myPeboNet->msgFromPeboPeer(myNodeId, PeerUpdateMessage(word1, word2, 0, false, 0));
             }
         }
+        else if (messageRaw.length() > 6 && messageRaw.substr(0, 6) == "QUERY ")
+        {
+            string service = messageRaw.substr(6);
+            assert(myPeboNet != nullptr);
+            myPeboNet->msgFromPeboPeer(myNodeId, QueryMessage(service, 0));
+        }
 
         /*
         // Write a dummy response
@@ -117,8 +123,8 @@ void SendMessageVisitor::peerUpdate(PeerUpdateMessage const & msg_in)
 
 void SendMessageVisitor::query(QueryMessage const & msg_in)
 {
-    // TODO
-    assert(false);
+    cerr << "SendMessageVisitor::query " << msg_in.getService() << endl;
+    myMessage = "QUERY " + msg_in.getService();
 }
 
 

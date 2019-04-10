@@ -37,7 +37,8 @@ void PeerUpdateMessage::visit(MessageVisitorBase & visitor_in) const
 }
 
 QueryMessage::QueryMessage(service_t service_in, timestamp_t createdTime_in) :
-BaseMessage(messageType::Query, createdTime_in)
+BaseMessage(messageType::Query, createdTime_in),
+myService(service_in)
 {
 }
 
