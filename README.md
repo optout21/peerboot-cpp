@@ -14,3 +14,9 @@ This is the C++ reference implementation.
 ## Status
 Early prototyping phase.
 
+## Building
+
+Prerequisites:
+* CMake (min 3.10)
+* libUV (libuv1-dev)
+
