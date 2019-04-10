@@ -124,7 +124,7 @@ errorCode PeboNet::doBroadcastMsg(BaseMessage const & msg_in, string origPrevHop
         // skip where it came from (previous hop)
         if (i->nodeId != origPrevHopNodeId_in)
         {
-            cerr << "PeboNet::doBroadcastMsg '" << origPrevHopNodeId_in << "' '" << i->nodeId << "'" << endl;
+            //cerr << "PeboNet::doBroadcastMsg '" << origPrevHopNodeId_in << "' '" << i->nodeId << "'" << endl;
             i->peer->sendMsg(msg_in);
         }
     }
