@@ -23,6 +23,8 @@ namespace pebo
         err_libNotInited,
         err_libAlreadyInited,
         err_libConfigErrorPeboNet,
+        err_networkListen,
+        err_networkGeneric,
     };
 
     /**

@@ -70,13 +70,25 @@ void Store::addPeer(IStore::PeerInfo peer_in)
         myStore[peer_in.service] = ServiceStore_t();
     }
     // add or overwrite
+    //long oldCount = countPrivate();
     myStore[peer_in.service][peer_in.endpoint] = peer_in;
-    //cerr << "Store::addPeer newcnt: " << countNonremoved() << " " << count() << endl;
+    /*
+    long newCount = countPrivate();
+    if (newCount != oldCount)
+    {
+        cerr << "Store::addPeer newcnt: " << countNonremoved() << " " << countPrivate() << endl;
+    }
+    */
 }
 
 long Store::count() const
 {
     lock_guard<mutex> lock(myMutex);
+    return countPrivate();
+}
+
+long Store::countPrivate() const
+{
     long c = 0;
     for(auto s = myStore.cbegin(); s != myStore.cend(); ++s)
     {

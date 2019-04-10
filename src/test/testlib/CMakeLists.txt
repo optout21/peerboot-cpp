@@ -9,12 +9,12 @@ add_library(libpbtest
 	testbench_shells.hpp
 )
 
-target_compile_definitions(libpeerboot
+target_compile_definitions(libpbtest
 	PRIVATE
 		-DPEBO_VERSION_MAJOR=${CPACK_PACKAGE_VERSION_MAJOR}
 		-DPEBO_VERSION_MINOR=${CPACK_PACKAGE_VERSION_MINOR})
 
-set_target_properties(libpeerboot
+set_target_properties(libpbtest
 	PROPERTIES
 		COMPILE_FLAGS
 			"-DSOMEPROP=1")

@@ -25,6 +25,7 @@ namespace pebo
     private:
         bool findPeer(service_t service_in, endpoint_t endpoint_in, PeerInfo & peerInfo_inout);
         void addPeer(IStore::PeerInfo peer_in);
+        long countPrivate() const;
         long countNonremoved() const;
 
     private:

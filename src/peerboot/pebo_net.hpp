@@ -2,7 +2,9 @@
 #include "ipebo_net.hpp"
 #include "ipebo_peer.hpp"
 #include "message.hpp"
+//#include "inet_handler.hpp"
 #include "store.hpp"
+
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -24,12 +26,15 @@ namespace pebo
         };
         PeboNet(IStore* store_in);
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
-        errorCode init(std::string nodeId_in);
-        errorCode deinit();
+        //errorCode init();
+        //errorCode deinit();
+        errorCode start();
+        errorCode stop();
         errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in);
         errorCode broadcast(PeerInfo const & peer_in);
         errorCode queryRemote(service_t service_in);
-        std::string getNodeId() { return myNodeId; };
+        std::string getNodeId() { return myNodeId; }
+        void setNodeId(std::string const & nodeId_in);
         // A message received from the peer
         void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in);
 
@@ -47,12 +52,13 @@ namespace pebo
         std::recursive_mutex myNetPeersMutex;
         IStore* myStore;
 
-        class MessageFromPeerVisitor: public MessageVisitorBase
+        // Put as inner class to access private methods
+        class FromPeerMessageVisitor: public MessageVisitorBase
         {
         public:
-            MessageFromPeerVisitor(PeboNet & net_in, std::string nodeId_in) :
+            FromPeerMessageVisitor(PeboNet & net_in, std::string nodeId_in) :
                 MessageVisitorBase(), myNet(net_in), myNodeId(nodeId_in) { }
-            virtual ~MessageFromPeerVisitor() = default;
+            virtual ~FromPeerMessageVisitor() = default;
             void peerUpdate(PeerUpdateMessage const & msg_in) { myNet.peerUpdateFromPeboPeer(myNodeId, msg_in); }
             void query(QueryMessage const & msg_in) { myNet.queryFromPeboPeer(myNodeId, msg_in); }
 

@@ -1,7 +1,12 @@
+find_package(Threads)
+
 add_library(libpeerboot
+	empty_net_handler.cpp
+	empty_net_handler.hpp
 	ipebo_net.hpp
 	ipebo_peer.hpp
 	ipebo_peer_cb.hpp
+	inet_handler.hpp
 	istore.hpp
 	lib.cpp
 	message.cpp
@@ -25,3 +30,8 @@ set_target_properties(libpeerboot
 	PROPERTIES
 		COMPILE_FLAGS
 			"-DSOMEPROP=1")
+
+target_link_libraries(libpeerboot
+	${PLATFORM_LIBS}
+    ${CMAKE_THREAD_LIBS_INIT}
+)

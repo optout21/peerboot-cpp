@@ -3,6 +3,8 @@
 #include "../testlib/testbench_shells.hpp"
 #include "../testlib/simul_client.hpp"
 #include "../../peerboot/timestamp.hpp"
+#include "../../peerboot/empty_net_handler.hpp"
+
 #include <cassert>
 #include <iostream>
 #include <memory>
@@ -37,9 +39,12 @@ int main()
     auto numClients = 4;
     auto clients = vector<shared_ptr<SimulClient>>();
     auto testBench = TestBenchShells();
+    auto emptyNetHandler = shared_ptr<INetHandler>(make_shared<EmptyNetHandler>());
     for(auto i = 0; i < numClients; ++i)
     {
         auto shell = make_shared<Shell>();
+        // If EmptyNetHandler is used, there is no networking.  Otherwise peers within the same process communicate over the net.
+        shell->setNetHandler(emptyNetHandler);
         pebo::errorCode err = shell->init(::notificationCB);
         assert(err == errorCode::err_ok);
         testBench.addShell(shell);

@@ -1,10 +1,12 @@
 #pragma once
 #include "../include/peerboot.hpp"
-#include "ipebo_peer_cb.hpp"
+//#include "ipebo_peer_cb.hpp"
 #include "message.hpp"
 
 namespace pebo
 {
+    class IPeboPeerCB; // forward
+
     /**
      * Represents a PeerBoot peer.
      */

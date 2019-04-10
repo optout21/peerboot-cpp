@@ -1,5 +1,7 @@
 #include "../../include/peerboot.hpp"
 #include <iostream>
+#include <sstream>
+#include <thread>
 
 using namespace pebo;
 using namespace std;
@@ -14,7 +16,9 @@ int main()
     cout << "Sample PeerBoot Client, v" << PEBO_VERSION_MAJOR << "." << PEBO_VERSION_MINOR << endl;
 
     pebo::service_t service ("sample.peerboot.io");
-    pebo::endpoint_t endpoint ("dummy_endpoint");
+    ostringstream threadid;
+    threadid << this_thread::get_id();
+    pebo::endpoint_t endpoint ("dummy_endpoint_" + threadid.str());
     pebo::errorCode err = pebo::init(service, endpoint, ::notificationCB);
     if (err)
     {

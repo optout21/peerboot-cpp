@@ -29,7 +29,6 @@ namespace pebo
         bool myVerbose;
         int myStartWait;
         int myStartKeep;
-        std::string myNodeId;
         std::thread myBgThread;
         bool myBgThreadStop;
     };

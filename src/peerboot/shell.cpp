@@ -1,5 +1,7 @@
 #include "shell.hpp"
 #include "pebo_net.hpp"
+//#include "net_handler.hpp"
+#include "empty_net_handler.hpp"
 #include "store.hpp"
 #include "timestamp.hpp"
 
@@ -9,12 +11,11 @@
 using namespace pebo;
 using namespace std;
 
-int Shell::myIdCounter = 0;
-
 Shell::Shell() :
 myInited(false),
 myCallback(nullptr),
 myPeboNet(nullptr),
+myNetHandler(nullptr),
 myStore(unique_ptr<IStore>(make_unique<Store>()))
 {
 }
@@ -40,21 +41,31 @@ errorCode Shell::init(NotificationCB callback_in)
 
     // components: Store -- created upfront
     assert (myStore != nullptr);
+    // components: NetHandler -- create if not set
+    if (myNetHandler == nullptr)
+    {
+        // default component -- for now EmptyNetHandler, TODO change later
+        myNetHandler = make_shared<EmptyNetHandler>();
+    }
+    assert(myNetHandler != nullptr);
     // components: PeboNet -- create if not yet set
     if (myPeboNet == nullptr)
     {
         // default component
-        assert (myStore != nullptr);
+        assert(myStore != nullptr);
         myPeboNet = make_shared<PeboNet>(myStore.get());
         myPeboNet->setNotifyCB(this);
     }
     assert(myPeboNet != nullptr);
-    ++myIdCounter;
-    errorCode res = myPeboNet->init("id" + to_string(myIdCounter));
-    if (res)
+
+    myNetHandler->init(myPeboNet);
+
+    assert(myNetHandler != nullptr);
+    int actualPort = myNetHandler->start(5001, 10);
+    //cerr << "actual port " << actualPort << endl;
+    if (actualPort < 0)
     {
-        myInited = false;
-        return res;
+        return errorCode::err_networkListen;
     }
 
     return errorCode::err_ok;
@@ -64,6 +75,13 @@ errorCode Shell::start(service_t service_in, endpoint_t endpoint_in)
 {
     // save client info
     myPeer = PeerInfo { service_in, endpoint_in, TimeStamp::now() };
+
+    assert(myPeboNet != nullptr);
+    errorCode netres = myPeboNet->start();
+    if (netres)
+    {
+        return netres;
+    }
 
     // broadcast this client to the net
     broadcast_refresh();
@@ -78,6 +96,11 @@ errorCode Shell::stop()
 {
     // broadcast good bye to the net
     broadcast_bye();
+
+    assert(myPeboNet != nullptr);
+    myPeboNet->stop();
+    assert(myNetHandler != nullptr);
+    myNetHandler->stop();
 
     // clear store
     myStore->clear();
@@ -95,10 +118,15 @@ errorCode Shell::deinit()
     myInited = false;
 
     errorCode res = errorCode::err_ok;
+    if (myNetHandler != nullptr)
+    {
+        // TODO myNetHandler deinit
+        myNetHandler = nullptr;
+    }
     if (myPeboNet != nullptr)
     {
-        errorCode res2 = myPeboNet->deinit();
-        if (res2 && !res) res = res2;
+        //errorCode res2 = myPeboNet->deinit();
+        //if (res2 && !res) res = res2;
         myPeboNet = nullptr;
     }
     myCallback = nullptr;
@@ -106,7 +134,12 @@ errorCode Shell::deinit()
     return res;
 }
 
-void Shell::setPeboNet(shared_ptr<IPeboNet> & peboNet_in)
+void Shell::setNetHandler(std::shared_ptr<INetHandler> & netHandler_in)
+{
+    myNetHandler = netHandler_in;
+}
+
+    void Shell::setPeboNet(shared_ptr<IPeboNet> & peboNet_in)
 {
     myPeboNet = peboNet_in;
 }

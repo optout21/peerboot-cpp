@@ -26,6 +26,7 @@ void ConnectorPeer::connect2Nets(IPeboNet* net1_in, IPeboNet* net2_in)
     assert(net1_in != net2_in);
     auto id1 = net1_in->getNodeId();
     auto id2 = net2_in->getNodeId();
+    //cerr << "ConnectorPeer::connect2Nets " << id1 << " " << id2 << endl;
     auto peerPair = createConnectedPair(id1, id2);
     // cross connect
     net1_in->addPeer(id2, peerPair.first);

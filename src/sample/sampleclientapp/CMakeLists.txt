@@ -19,6 +19,7 @@ set_target_properties(peerboot_sampleclientapp
 target_link_libraries(peerboot_sampleclientapp
 	libpeerboot
 	${PLATFORM_LIBS}
+	${CMAKE_THREAD_LIBS_INIT}
 )
 
 if(NOT APPLE)

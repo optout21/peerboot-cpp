@@ -5,16 +5,18 @@
 using namespace pebo;
 using namespace std;
 
+//long SimulClient::myIdCounter = 0;
+
 SimulClient::SimulClient(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::Shell* shell_in, bool verbose_in, int waitTime_in, int keepTime_in) :
 myService(service_in),
 myEndpoint(endpoint_in),
 myShell(shell_in),
 myVerbose(verbose_in),
 myStartWait(waitTime_in),
-myStartKeep(keepTime_in),
-myNodeId(shell_in->getPeboNet()->getNodeId())
+myStartKeep(keepTime_in)
+//myNodeId("id" + to_string(++myIdCounter))
 {
-    if (myVerbose) cout << "SimulClient " << myNodeId << "; " << myStartWait << " " << myStartKeep << endl;
+    if (myVerbose) cout << "SimulClient; " << myStartWait << " " << myStartKeep << endl;
 }
 
 void SimulClient::notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
@@ -24,12 +26,14 @@ void SimulClient::notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
 
 errorCode SimulClient::start()
 {
-    pebo::errorCode err = myShell->start(myService, myEndpoint);
+    /*
+    pebo::errorCode err = myShell->start(myService, myEndpoint, false);
     if (err)
     {
         cerr << "Could not initialize Shell, err: " << err << " service: " << myService << " endpoint: " << myEndpoint << endl;
         return err;
     }
+    */
 
     myBgThread = move(thread([=]() { this->doBgThread(); return 1; }));
     return errorCode::err_ok;
@@ -43,7 +47,7 @@ void SimulClient::stop()
 
 errorCode SimulClient::doStart()
 {
-    if (myVerbose) cout << "SimulClient " << myNodeId << ": doStart" << endl;
+    if (myVerbose) cout << "SimulClient: doStart" << endl;
     assert(myShell != nullptr);
     errorCode err = myShell->start(myService, myEndpoint);
     return err;
@@ -51,7 +55,7 @@ errorCode SimulClient::doStart()
 
 errorCode SimulClient::doStop()
 {
-    if (myVerbose) cout << "SimulClient " << myNodeId << ": doStop" << endl;
+    if (myVerbose) cout << "SimulClient: doStop" << endl;
     assert(myShell != nullptr);
     errorCode err = myShell->stop();
     return err;

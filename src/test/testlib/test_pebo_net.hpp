@@ -15,12 +15,15 @@ namespace pebo
     public:
         TestPeboNet() = default;
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
-        errorCode init(std::string nodeId_in);
-        errorCode deinit();
+        //errorCode init();
+        //errorCode deinit();
+        errorCode start();
+        errorCode stop();
         errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in) { assert(false); };
         errorCode broadcast(PeerInfo const & peer_in);
         errorCode queryRemote(service_t service_in) { assert(false); }
-        std::string getNodeId() { assert(false); };
+        std::string getNodeId() { assert(false); return ""; }
+        void setNodeId(std::string const & nodeId_in) { assert(false); }
         void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in) { assert(false); }
 
     private:

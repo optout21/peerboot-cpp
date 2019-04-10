@@ -16,13 +16,13 @@ void TestPeboNet::setNotifyCB(IPeboNetCB* peboNetCB_in)
     myPeboNetCB = peboNetCB_in;
 }
 
-errorCode TestPeboNet::init(string nodeId_in)
+errorCode TestPeboNet::start()
 {
     myBgThread = move(thread([=]() { this->doBgThread(); return 1; }));
     return errorCode::err_ok;
 }
 
-errorCode TestPeboNet::deinit()
+errorCode TestPeboNet::stop()
 {
     myBgThreadStop = true;
     myBgThread.join();
