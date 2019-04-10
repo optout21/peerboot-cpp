@@ -11,12 +11,16 @@ add_library(libpeerboot
 	lib.cpp
 	message.cpp
 	message.hpp
+	net_client.cpp
+	net_client.hpp
 	pebo_net.cpp
 	pebo_net.hpp
 	timestamp.cpp
 	timestamp.cpp
 	shell.cpp
 	shell.hpp
+	net_handler.cpp
+	net_handler.hpp
 	store.cpp
 	store.hpp
 )
