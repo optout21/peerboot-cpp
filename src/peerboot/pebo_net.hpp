@@ -33,20 +33,22 @@ namespace pebo
         errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in);
         errorCode broadcast(PeerInfo const & peer_in);
         errorCode queryRemote(service_t service_in);
-        std::string getNodeId() { return myNodeId; }
-        void setNodeId(std::string const & nodeId_in);
+        //std::string getNodeId() { return myNodeId; }
+        //void setNodeId(std::string const & nodeId_in);
         // A message received from the peer
         void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in);
+        static const std::string myLoalNodeId;
 
     private:
         void peerUpdateFromPeboPeer(std::string nodeId_in, PeerUpdateMessage const & msg_in);
         void queryFromPeboPeer(std::string nodeId_in, QueryMessage const & msg_in);
-        errorCode doBroadcastMsg(BaseMessage const & msg_in, std::string originatorNodeId);
+        // origPrevHopNodeId_in: the nodeId of the node where this came from, to avoid sending back; or myLoalNodeId for locally-originated messages.
+        errorCode doBroadcastMsg(BaseMessage const & msg_in, std::string origPrevHopNodeId_in);
         errorCode doQuery(std::string nodeId_in, service_t service_in);
         errorCode doClientCallback(PeerInfo const & peer_in);
 
     private:
-        std::string myNodeId;
+        //std::string myNodeId;
         IPeboNetCB* myPeboNetCB;
         std::vector<PeerWithId> myNetPeers;
         std::recursive_mutex myNetPeersMutex;

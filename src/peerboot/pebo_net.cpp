@@ -9,10 +9,13 @@
 using namespace pebo;
 using namespace std;
 
+
+const string PeboNet::myLoalNodeId = "__LOCAL_NODE__";
+
 PeboNet::PeboNet(IStore* store_in) :
 myPeboNetCB(nullptr),
-myStore(store_in),
-myNodeId("?")
+myStore(store_in)
+//myNodeId("")
 {
     assert(myStore != nullptr);
 }
@@ -53,22 +56,24 @@ errorCode PeboNet::addPeer(string nodeId_in, shared_ptr<IPeboPeer> const & peer_
 
 errorCode PeboNet::broadcast(PeerInfo const & peer_in)
 {
-    return doBroadcastMsg(PeerUpdateMessage(peer_in.service, peer_in.endpoint, peer_in.lastSeen, peer_in.isRemoved, 0), myNodeId);
+    return doBroadcastMsg(PeerUpdateMessage(peer_in.service, peer_in.endpoint, peer_in.lastSeen, peer_in.isRemoved, 0), myLoalNodeId);
 }
 
 errorCode PeboNet::queryRemote(service_t service_in)
 {
-    return doBroadcastMsg(QueryMessage(service_in, 0), myNodeId);
+    return doBroadcastMsg(QueryMessage(service_in, 0), myLoalNodeId);
 }
 
+/*
 void PeboNet::setNodeId(std::string const & nodeId_in)
 { 
-    if (myNodeId.length() == 0 || myNodeId == "?")
+    if (myNodeId.length() == 0)
     {
         myNodeId = nodeId_in;
         //cerr << "PeboNet::setNodeId " << myNodeId << endl;
     }
 }
+*/
 
 void PeboNet::peerUpdateFromPeboPeer(string nodeId_in, PeerUpdateMessage const & msg_in)
 {
@@ -105,9 +110,9 @@ void PeboNet::msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in)
     msg_in.visit(visitor);
 }
 
-errorCode PeboNet::doBroadcastMsg(BaseMessage const & msg_in, string originatorNodeId)
+errorCode PeboNet::doBroadcastMsg(BaseMessage const & msg_in, string origPrevHopNodeId_in)
 {
-    //cerr << "PeboNet::doBroadcastMsg " << msg_in.getType() << " " << originatorNodeId << " " << myNetPeers.size() << endl;
+    //cerr << "PeboNet::doBroadcastMsg " << msg_in.getType() << " " << origPrevHopNodeId_in << " " << myNetPeers.size() << endl;
     std::vector<PeerWithId> netPeersCopy;
     { // lock scope
         lock_guard<recursive_mutex> lock(myNetPeersMutex);
@@ -116,10 +121,10 @@ errorCode PeboNet::doBroadcastMsg(BaseMessage const & msg_in, string originatorN
     //cerr << "peers: " << netPeersCopy.size() << endl;
     for(auto i = netPeersCopy.begin(); i != netPeersCopy.end(); ++i)
     {
-        // skip originator
-        if (i->nodeId != originatorNodeId)
+        // skip where it came from (previous hop)
+        if (i->nodeId != origPrevHopNodeId_in)
         {
-            //cerr << "PeboNet::doBroadcastMsg '" << originatorNodeId << "' '" << i->nodeId << "'" << endl;
+            cerr << "PeboNet::doBroadcastMsg '" << origPrevHopNodeId_in << "' '" << i->nodeId << "'" << endl;
             i->peer->sendMsg(msg_in);
         }
     }
@@ -140,7 +145,7 @@ errorCode PeboNet::doQuery(std::string nodeId_in, service_t service_in)
     {
         // broadcast result to net.  Originator is myself
         //cerr << "QUERY res " << nodeId_in << " " << i->endpoint << endl;
-        doBroadcastMsg(PeerUpdateMessage(i->service, i->endpoint, i->lastSeen, i->isRemoved, 0), myNodeId);
+        doBroadcastMsg(PeerUpdateMessage(i->service, i->endpoint, i->lastSeen, i->isRemoved, 0), myLoalNodeId);
     }
     return errorCode::err_ok;
 }

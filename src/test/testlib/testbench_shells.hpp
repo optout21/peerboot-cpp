@@ -2,7 +2,7 @@
 
 #include "../../peerboot/shell.hpp"
 #include <memory>
-#include <vector>
+#include <map>
 
 namespace pebo
 {
@@ -18,6 +18,7 @@ namespace pebo
         void deinit();
 
     private:
-        std::vector<std::shared_ptr<Shell>> myShells;
+        std::map<std::string, std::shared_ptr<Shell>> myShells;
+        static long myCounter;
     };
 }
