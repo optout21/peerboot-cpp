@@ -3,7 +3,13 @@
 #include "ipebo_peer.hpp"
 //#include "ipebo_net.hpp"
 //#include "ipebo_peer_cb.hpp"
+#include "uv_socket.hpp"
+
+#include <uv.h>
+
+#include <queue>
 #include <string>
+#include <vector>
 
 namespace pebo
 {
@@ -43,15 +49,21 @@ namespace pebo
     /**
      * Network PeerBoot client, outgoing connection.  Simple Clib networking.
      */
-    class NetClientOut: public NetClientBase
+    class NetClientOut: public IUvSocket, public NetClientBase
     {
     public:
         NetClientOut(IPeboNet* peboNet_in, std::string const & host_in, int port_in);
         // Send a message to this peer
         errorCode sendMsg(BaseMessage const & msg_in);
+        static void on_connect(uv_connect_t* req, int status);
+        static void on_write(uv_write_t* req, int status);
+        void onConnect(uv_connect_t* req, int status);
+        void onWrite(uv_write_t* req, int status);
+        void doSend(uv_stream_t* handle);
 
     private:
         std::string myHost;
         int myPort;
+        std::queue<std::vector<uint8_t>> mySendQueue;
     };
 }

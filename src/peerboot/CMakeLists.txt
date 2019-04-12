@@ -23,6 +23,7 @@ add_library(libpeerboot
 	net_handler.hpp
 	store.cpp
 	store.hpp
+	uv_socket.hpp
 )
 
 target_compile_definitions(libpeerboot
@@ -36,6 +37,7 @@ set_target_properties(libpeerboot
 			"-DSOMEPROP=1")
 
 target_link_libraries(libpeerboot
+	uv
 	${PLATFORM_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
 )
