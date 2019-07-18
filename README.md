@@ -23,5 +23,10 @@ Early prototyping phase.
 git clone https://github.com/catenocrypt/peerboot-cpp.git
 ### Initalize CMake and compile
 cmake -DCMAKE_BUILD_TYPE=Debug .
+
 make
+
+### Sample all
+./peerboot_sampleclientapp
+
 
