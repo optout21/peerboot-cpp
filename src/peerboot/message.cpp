@@ -36,6 +36,12 @@ void PeerUpdateMessage::visit(MessageVisitorBase & visitor_in) const
     visitor_in.peerUpdate(*this);
 }
 
+std::string PeerUpdateMessage::toString() const
+{
+    return "PEER " + getService() + " " + getEndpoint();
+}
+
+
 QueryMessage::QueryMessage(service_t service_in, timestamp_t createdTime_in) :
 BaseMessage(messageType::Query, createdTime_in),
 myService(service_in)
@@ -45,4 +51,9 @@ myService(service_in)
 void QueryMessage::visit(MessageVisitorBase & visitor_in) const
 {
     visitor_in.query(*this);
+}
+
+std::string QueryMessage::toString() const
+{
+    return "QUERY " + getService();
 }

@@ -1,7 +1,6 @@
 #include "shell.hpp"
 #include "pebo_net.hpp"
-//#include "net_handler.hpp"
-#include "empty_net_handler.hpp"
+#include "net_handler.hpp"
 #include "store.hpp"
 #include "timestamp.hpp"
 
@@ -44,8 +43,8 @@ errorCode Shell::init(NotificationCB callback_in)
     // components: NetHandler -- create if not set
     if (myNetHandler == nullptr)
     {
-        // default component -- for now EmptyNetHandler, TODO change later
-        myNetHandler = make_shared<EmptyNetHandler>();
+        // default component
+        myNetHandler = make_shared<NetHandler>();
     }
     assert(myNetHandler != nullptr);
     // components: PeboNet -- create if not yet set
@@ -61,7 +60,7 @@ errorCode Shell::init(NotificationCB callback_in)
     myNetHandler->init(myPeboNet);
 
     assert(myNetHandler != nullptr);
-    int actualPort = myNetHandler->start(5001, 10);
+    int actualPort = myNetHandler->start(5000, 10);
     //cerr << "actual port " << actualPort << endl;
     if (actualPort < 0)
     {
@@ -120,7 +119,7 @@ errorCode Shell::deinit()
     errorCode res = errorCode::err_ok;
     if (myNetHandler != nullptr)
     {
-        // TODO myNetHandler deinit
+        myNetHandler->stop();
         myNetHandler = nullptr;
     }
     if (myPeboNet != nullptr)

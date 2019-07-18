@@ -25,6 +25,7 @@ namespace pebo
         virtual ~BaseMessage() = default;
         messageType getType() const { return myType; }
         virtual void visit(MessageVisitorBase & visitor_in) const = 0;
+        virtual std::string toString() const = 0;
 
     private:
         messageType myType;
@@ -45,6 +46,7 @@ namespace pebo
         timestamp_t getLastSeen() const { return myLastSeen; }
         bool getIsRemoved() const { return myIsRemoved; }
         void visit(MessageVisitorBase & visitor_in) const;
+        std::string toString() const;
         
     private:
         service_t myService;
@@ -62,6 +64,7 @@ namespace pebo
         QueryMessage(service_t service_in, timestamp_t createdTime_in);
         service_t getService() const { return myService; }
         void visit(MessageVisitorBase & visitor_in) const;
+        std::string toString() const;
 
     private:
         service_t myService;

@@ -5,8 +5,8 @@
 using namespace pebo;
 using namespace std;
 
-ConnectorPeer::ConnectorPeer(std::string nodeId_in) :
-myNodeId(nodeId_in)
+ConnectorPeer::ConnectorPeer(std::string nodeAddr_in) :
+myNodeAddr(nodeAddr_in)
 {
 }
 
@@ -21,15 +21,17 @@ pair<shared_ptr<ConnectorPeer>, shared_ptr<ConnectorPeer>> ConnectorPeer::create
     return pair<shared_ptr<ConnectorPeer>, shared_ptr<ConnectorPeer>>(peer1, peer2);
 }
 
-void ConnectorPeer::connect2Nets(IPeboNet* net1_in, IPeboNet* net2_in, std::string nodeId1_in, std::string nodeId2_in)
+void ConnectorPeer::connect2Nets(IPeboNet* net1_in, IPeboNet* net2_in, std::string nodeAddr1_in, std::string nodeAddr2_in)
 {
     assert(net1_in != net2_in);
     //cerr << "ConnectorPeer::connect2Nets " << id1 << " " << id2 << endl;
-    auto peerPair = createConnectedPair(nodeId1_in, nodeId2_in);
+    auto peerPair = createConnectedPair(nodeAddr1_in, nodeAddr2_in);
     // cross connect
-    net1_in->addPeer(nodeId2_in, peerPair.first);
+    auto peer1 = dynamic_pointer_cast<IPeboPeer>(peerPair.first);
+    auto peer2 = dynamic_pointer_cast<IPeboPeer>(peerPair.second);
+    net1_in->inConnectionReceived(nodeAddr2_in, peer1);
     peerPair.first->setNotifyCB(net1_in);
-    net2_in->addPeer(nodeId1_in, peerPair.second);
+    net2_in->inConnectionReceived(nodeAddr1_in, peer2);
     peerPair.second->setNotifyCB(net2_in);
 }
 
@@ -44,15 +46,16 @@ void ConnectorPeer::setNotifyCB(IPeboPeerCB* peboPeerCB_in)
     myPeboPeerCB = peboPeerCB_in;
 }
 
-errorCode ConnectorPeer::sendMsg(BaseMessage const & msg_in)
+int ConnectorPeer::sendMessage(BaseMessage const & msg_in)
 {
     // pass it to our peer
     assert(myPeer != nullptr);
     myPeer->messageFromNet(msg_in);
+    return 0;
 }
 
 void ConnectorPeer::messageFromNet(BaseMessage const & msg_in)
 {
     assert(myPeboPeerCB != nullptr);
-    myPeboPeerCB->msgFromPeboPeer(myNodeId, msg_in);
+    myPeboPeerCB->msgFromPeboPeer(*this, msg_in);
 }

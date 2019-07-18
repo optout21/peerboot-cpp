@@ -9,7 +9,7 @@ void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
     cout << "Notification: " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << endl;
 }
 
-// Generate endpoint suffix baed on current time
+// Generate endpoint suffix based on current time
 string getEndpointSuffix()
 {
     std::string suffix;

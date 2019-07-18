@@ -15,6 +15,7 @@ namespace pebo
     public:
         virtual void setNotifyCB(IPeboPeerCB* peboPeerCB_in) = 0;
         // Send a message to this peer
-        virtual errorCode sendMsg(BaseMessage const & msg_in) = 0;
+        virtual int sendMessage(BaseMessage const & msg_in) = 0;
+        virtual std::string getNodeAddr() const = 0;
     };
 }

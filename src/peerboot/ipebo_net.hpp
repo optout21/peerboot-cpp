@@ -26,7 +26,11 @@ namespace pebo
         //virtual errorCode deinit() = 0;
         virtual errorCode start() = 0;
         virtual errorCode stop() = 0;
-        virtual errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in) = 0;
+        /// Called when server is listening on a port already
+        virtual void listenStarted(int port) = 0;
+        /// Called when a new incoming connection is received
+        virtual void inConnectionReceived(std::string nodeAddr_in, std::shared_ptr<IPeboPeer>& peer_in) = 0;
+        //virtual errorCode addPeer(std::string nodeAddr_in, std::shared_ptr<IPeboPeer> const & peer_in) = 0;
         // Broadcast peer info towards the network
         virtual errorCode broadcast(PeerInfo const & peer_in) = 0;
         // Perform query from the peers, results will come asynchronously

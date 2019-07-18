@@ -1,6 +1,6 @@
 # PeerBoot
 ## What is PeerBoot?
-PeerBoot is a library _and_ P2P network solving initial peer node discovery for any P2P project.
+PeerBoot is a library _and_ P2P network that solves initial peer node discovery for any P2P project.
 
 This is the C++ reference implementation.
 
@@ -14,9 +14,14 @@ This is the C++ reference implementation.
 ## Status
 Early prototyping phase.
 
-## Building
-
-Prerequisites:
+## Build instructions
+### Prerequisites
+* C++ compiler
 * CMake (min 3.10)
-* libUV (libuv1-dev)
+* LibUV (libuv1-dev)
+### Obtain sources
+git clone https://github.com/catenocrypt/peerboot-cpp.git
+### Initalize CMake and compile
+cmake -DCMAKE_BUILD_TYPE=Debug .
+make
 

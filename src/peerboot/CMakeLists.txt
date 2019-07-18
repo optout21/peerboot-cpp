@@ -11,14 +11,20 @@ add_library(libpeerboot
 	lib.cpp
 	message.cpp
 	message.hpp
+	net_client.cpp
+	net_client.hpp
 	pebo_net.cpp
 	pebo_net.hpp
 	timestamp.cpp
 	timestamp.cpp
 	shell.cpp
 	shell.hpp
+	net_handler.cpp
+	net_handler.hpp
 	store.cpp
 	store.hpp
+	uv_socket.cpp
+	uv_socket.hpp
 )
 
 target_compile_definitions(libpeerboot
@@ -32,6 +38,7 @@ set_target_properties(libpeerboot
 			"-DSOMEPROP=1")
 
 target_link_libraries(libpeerboot
+	uv
 	${PLATFORM_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
 )
