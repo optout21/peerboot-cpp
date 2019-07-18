@@ -66,21 +66,25 @@ void PeboNet::listenStarted(int port)
             addOutPeer(client->getNodeAddr(), client);
         }
     }
-    tryOutConnections();
 
     /*
     // outgoing clients, predefined, TODO
+    auto client = make_shared<NetClientOut>(this, "192.168.0.100", 5000);
+    //assert(myPeboNet != nullptr);
+    addOutPeer(client->getNodeAddr(), client);
     for (int p = 5000; p <= 5005; ++p)
     {
         if (actualPort != p)
         {
             //cerr << p << " " << actualPort << endl;
-            auto client = make_shared<NetClientOut>(myPeboNet.get(), "localhost", p);
+            auto client = make_shared<NetClientOut>(this, "localhost", p);
             assert(myPeboNet != nullptr);
-            myPeboNet->addPeer(client->getNodeId(), client);
+            myPeboNet->addPeer(client->getNodeAddr(), client);
         }
     }
     */
+
+    tryOutConnections();
 }
 
 void PeboNet::addInPeer(string nodeAddr_in, shared_ptr<IPeboPeer>& peer_in)
