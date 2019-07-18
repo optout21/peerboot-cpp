@@ -17,8 +17,8 @@ namespace pebo
     public:
         EmptyNetHandler() = default;
         void init(std::shared_ptr<IPeboNet> peboNet_in);
-        errorCode start(int port_in, int tryNextPorts_in);
-        errorCode stop();
+        int start(int port_in, int tryNextPorts_in);
+        int stop();
         
     private:
         std::shared_ptr<IPeboNet> myPeboNet;

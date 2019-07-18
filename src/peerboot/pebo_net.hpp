@@ -11,6 +11,8 @@
 
 namespace pebo
 {
+    class NetClientOut; // forward
+
     /**
      * Represents the PeerBoot network.
      * TODO: fill it
@@ -18,11 +20,17 @@ namespace pebo
     class PeboNet : public IPeboNet
     {
     public:
-        struct PeerWithId
+        struct PeerInWithId
         {
         public:
-            std::string nodeId;
+            std::string nodeAddr;
             std::shared_ptr<IPeboPeer> peer;
+        };
+        struct PeerOutWithId
+        {
+        public:
+            std::string nodeAddr;
+            std::shared_ptr<NetClientOut> peer;
         };
         PeboNet(IStore* store_in);
         void setNotifyCB(IPeboNetCB* peboNetCB_in);
@@ -30,43 +38,51 @@ namespace pebo
         //errorCode deinit();
         errorCode start();
         errorCode stop();
-        errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in);
+        /// Called when server is listening on a port already
+        void listenStarted(int port);
+        /// Called when a new incoming connection is received
+        void inConnectionReceived(std::string nodeAddr_in, std::shared_ptr<IPeboPeer>& peer_in);
         errorCode broadcast(PeerInfo const & peer_in);
         errorCode queryRemote(service_t service_in);
         //std::string getNodeId() { return myNodeId; }
         //void setNodeId(std::string const & nodeId_in);
         // A message received from the peer
-        void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in);
-        static const std::string myLoalNodeId;
+        void msgFromPeboPeer(IPeboPeer& peer_in, BaseMessage const & msg_in);
+        static const std::string myLocalNodeAddr;
 
     private:
-        void peerUpdateFromPeboPeer(std::string nodeId_in, PeerUpdateMessage const & msg_in);
-        void queryFromPeboPeer(std::string nodeId_in, QueryMessage const & msg_in);
-        // origPrevHopNodeId_in: the nodeId of the node where this came from, to avoid sending back; or myLoalNodeId for locally-originated messages.
-        errorCode doBroadcastMsg(BaseMessage const & msg_in, std::string origPrevHopNodeId_in);
-        errorCode doQuery(std::string nodeId_in, service_t service_in);
+        void addInPeer(std::string nodeAddr_in, std::shared_ptr<IPeboPeer>& peer_in);
+        void addOutPeer(std::string nodeAddr_in, std::shared_ptr<NetClientOut>& peer_in);
+        void tryOutConnections();
+        void peerUpdateFromPeboPeer(IPeboPeer& peer_in, PeerUpdateMessage const & msg_in);
+        void queryFromPeboPeer(IPeboPeer& peer_in, QueryMessage const & msg_in);
+        // origPrevHopNodeId_in: the nodeId of the node where this came from, to avoid sending back; or myLocalNodeId for locally-originated messages.
+        errorCode doBroadcastMsg(BaseMessage const & msg_in, std::string origPrevHopNodeAddr_in);
+        errorCode doQuery(IPeboPeer& peer_in, service_t service_in);
         errorCode doClientCallback(PeerInfo const & peer_in);
 
     private:
         //std::string myNodeId;
         IPeboNetCB* myPeboNetCB;
-        std::vector<PeerWithId> myNetPeers;
-        std::recursive_mutex myNetPeersMutex;
+        std::vector<PeerInWithId> myPeersIn;
+        std::vector<PeerOutWithId> myPeersOut;
+        std::recursive_mutex myPeersInMutex;
+        std::recursive_mutex myPeersOutMutex;
         IStore* myStore;
 
         // Put as inner class to access private methods
         class FromPeerMessageVisitor: public MessageVisitorBase
         {
         public:
-            FromPeerMessageVisitor(PeboNet & net_in, std::string nodeId_in) :
-                MessageVisitorBase(), myNet(net_in), myNodeId(nodeId_in) { }
+            FromPeerMessageVisitor(PeboNet & net_in, IPeboPeer& peer_in) :
+                MessageVisitorBase(), myNet(net_in), myPeer(peer_in) { }
             virtual ~FromPeerMessageVisitor() = default;
-            void peerUpdate(PeerUpdateMessage const & msg_in) { myNet.peerUpdateFromPeboPeer(myNodeId, msg_in); }
-            void query(QueryMessage const & msg_in) { myNet.queryFromPeboPeer(myNodeId, msg_in); }
+            void peerUpdate(PeerUpdateMessage const & msg_in) { myNet.peerUpdateFromPeboPeer(myPeer, msg_in); }
+            void query(QueryMessage const & msg_in) { myNet.queryFromPeboPeer(myPeer, msg_in); }
 
         private:
-            PeboNet & myNet;
-            std::string myNodeId;
+            PeboNet& myNet;
+            IPeboPeer& myPeer;
         };
     };
 }

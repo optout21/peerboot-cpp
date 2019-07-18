@@ -15,12 +15,12 @@ void EmptyNetHandler::init(std::shared_ptr<IPeboNet> peboNet_in)
     assert(myPeboNet != nullptr);
 }
 
-errorCode EmptyNetHandler::start(int port_in, int tryNextPorts_in) 
+int EmptyNetHandler::start(int port_in, int tryNextPorts_in)
 {
-    return errorCode::err_ok;
+    return 0;
 }
 
-errorCode EmptyNetHandler::stop()
+int EmptyNetHandler::stop()
 {
-    return errorCode::err_ok;
+    return 0;
 }

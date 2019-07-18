@@ -36,6 +36,19 @@ errorCode TestPeboNet::broadcast(PeerInfo const & peer_in)
     return errorCode::err_ok;
 }
 
+errorCode TestPeboNet::queryRemote(service_t service_in)
+{
+    for(auto i = myPeers.begin(), n = myPeers.end(); i != n; ++i)
+    {
+        if (i->service == service_in && !i->isRemoved)
+        {
+            //std::cerr << "  " << i->service << " " << i->endpoint << std::endl;
+            doClientCallback(*i);
+        }
+    }
+    return errorCode::err_ok;
+}
+
 errorCode TestPeboNet::doClientCallback(PeerInfo const & peer_in)
 {
     assert(myPeboNetCB != nullptr);

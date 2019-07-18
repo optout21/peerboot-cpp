@@ -15,7 +15,7 @@ namespace pebo
     {
     public:
         virtual void init(std::shared_ptr<IPeboNet> peboNet_in) = 0;
-        virtual errorCode start(int port_in, int tryNextPorts_in) = 0;
-        virtual errorCode stop() = 0;
+        virtual int start(int port_in, int tryNextPorts_in) = 0;
+        virtual int stop() = 0;
     };
 }

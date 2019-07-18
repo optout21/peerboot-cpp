@@ -23,6 +23,7 @@ add_library(libpeerboot
 	net_handler.hpp
 	store.cpp
 	store.hpp
+	uv_socket.cpp
 	uv_socket.hpp
 )
 

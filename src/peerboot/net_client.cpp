@@ -1,30 +1,30 @@
 #include "net_client.hpp"
+
 #include "ipebo_net.hpp"
 #include "message.hpp"
+#include "net_handler.hpp"
 #include "uv_socket.hpp"
 
 #include <uv.h>
 
 #include <cassert>
 #include <iostream>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <unistd.h>
+#include <sstream>
 
 using namespace pebo;
 using namespace std;
 
 
-NetClientBase::NetClientBase(IPeboNet* peboNet_in, string const & nodeId_in) :
+NetClientBase::NetClientBase(IPeboNet* peboNet_in, string const & nodeAddr_in) :
 myPeboNet(peboNet_in),
-myNodeId(nodeId_in)
+myNodeAddr(nodeAddr_in)
 {
 }
 
+NetClientBase::~NetClientBase()
+{
+    //cout << "~NetClientBase " << myNodeAddr << endl;
+}
 
 void NetClientBase::setNotifyCB(IPeboPeerCB* peboPeerCB_in)
 {
@@ -32,105 +32,259 @@ void NetClientBase::setNotifyCB(IPeboPeerCB* peboPeerCB_in)
     // use myPeboNet;
 }
 
-
-NetClientIn::NetClientIn(IPeboNet* peboNet_in, int socket_in, string const & nodeId_in) :
-NetClientBase(peboNet_in, nodeId_in),
-mySocket(socket_in)
+void NetClientBase::setUvStream(uv_tcp_t* stream_in)
 {
+    myUvStream = stream_in;
+    myUvStream->data = (void*)dynamic_cast<IUvSocket*>(this);
 }
 
-errorCode NetClientIn::sendMsg(BaseMessage const & msg_in)
+int NetClientBase::sendMessage(BaseMessage const & msg_in)
 {
-    cerr << "ERROR NetClientIn::sendMsg " << myNodeId << " " << msg_in.getType() << endl;
-    assert(false);
-    // TODO
-    return errorCode::err_generic;
-}
-
-errorCode NetClientIn::doProcessIncomingMessage()
-{
-    assert(mySocket > 0);
-    // communicate with client, process one message
-    string pending;
-    static const int buflen = 256;
-    char buffer[buflen];
-    while (true)
+    //cout << "NetClientBase::sendMessage " << msg_in.toString() << " " << myState << endl;
+    if (myState == State::Closing || myState == State::Closed)
     {
-        bzero(buffer, buflen);
-        int n = ::read(mySocket, buffer, buflen );
-        if (n < 0)
+        return 0;
+    }
+    myState = State::Sending;
+    string msg = msg_in.toString();
+    //cout << "sendMessage " << msg.length() << " '" << msg << "'" << endl;
+    msg += '\n'; // terminator
+    // convert to byte array
+    vector<uint8_t> binmsg(msg.begin(), msg.end());
+
+    uv_write_t* req = new uv_write_t();
+    // wrap buffers into a UvWriteRequest object
+    UvWriteRequest* wrreq = new UvWriteRequest(dynamic_cast<IUvSocket*>(this), 1);
+    wrreq->add(binmsg);
+    req->data = (void*)wrreq;
+    int res = ::uv_write(req, (uv_stream_t*)myUvStream, &(wrreq->bufs[0]), wrreq->nbuf, NetClientBase::on_write);
+    if (res)
+    {
+        if (res == -EBADF)
         {
-            cerr << "Error reading from socket " << n << " " << mySocket << " pending " << pending.length() << endl;
-            ::close(mySocket);
-            mySocket = EINVAL;
-            return errorCode::err_generic;
+            // socket closed
         }
-        if (n == 0)
+        else
         {
-            cerr << "Socket closed while reading " << mySocket << " pending " << pending.length() << endl;
-            ::close(mySocket);
-            mySocket = EINVAL;
-            return errorCode::err_ok;
+            cerr << "Error from uv_write " << res << " " << ::uv_err_name(res) << endl;
         }
-        pending.append(buffer);
-        //cerr << "read " << n << " bytes" << " pending " << pending.length() << endl;
-        // process accumulated pending
-        int terminatorIdx;
-        while ((terminatorIdx = pending.find('\n')) >= 0)
+        close();
+        return res;
+    }
+    return 0;
+}
+
+void NetClientBase::on_close(uv_handle_t* handle)
+{
+    //cout << "on_close" << endl;
+    IUvSocket* uvSocket = (IUvSocket*)handle->data;
+    if (uvSocket == nullptr)
+    {
+        cerr << "Fatal error: uvSocket is nullptr " << endl;
+        return;
+    }
+    uvSocket->onClose(handle);
+}
+
+void NetClientBase::onClose(uv_handle_t* handle)
+{
+    //cout << "onClose" << endl;
+    if (myPeboNet != nullptr)
+    {
+        // TODO myApp->connectionClosed(this);
+    }
+    if (handle != NULL)
+    {
+        delete handle;
+    }
+    myState = State::Closed;
+}
+
+int NetClientBase::close()
+{
+    //cout << "NetClientBase::close " << getNodeAddr() << endl;
+    myState = State::Closing;
+    uv_handle_t* handle = (uv_handle_t*)myUvStream;
+    if (handle == nullptr) return 0;
+    myUvStream = nullptr; // prevent double close
+    if (::uv_is_closing(handle))
+    {
+        // already closing
+        cerr << "Warning: Socket is already closing " << getNodeAddr() << endl;
+        onClose(handle);
+        return 0;
+    }
+    handle->data = (void*)dynamic_cast<IUvSocket*>(this);
+    ::uv_close(handle, NetClientBase::on_close);
+    //cout << "NetClientBase::close closed" << endl;
+}
+
+void NetClientBase::on_write(uv_write_t* req, int status) 
+{
+    //cout << "on_write " << status << endl;
+    UvWriteRequest* wrreq = (UvWriteRequest*)req->data;
+    if (wrreq == nullptr)
+    {
+        cerr << "Fatal error: uv_write_t->data is nullptr " << endl;
+        //uv_close((uv_handle_t*)req->handle, NULL);
+        return;
+    }
+    IUvSocket* uvSocket = wrreq->uvSocket;
+    if (uvSocket == nullptr)
+    {
+        cerr << "Fatal error: uvSocket is nullptr " << endl;
+        //uv_close((uv_handle_t*)req->handle, NULL);
+        return;
+    }
+    uvSocket->onWrite(req, status);
+    delete wrreq;
+    delete req;
+}
+
+void NetClientBase::onWrite(uv_write_t* req, int status)
+{
+    //cout << "NetClientBase::onWrite " << status << " "  << myState << endl;
+    assert(myState == State::Connected || myState == State::Sending || myState == State::Receiving || myState == State::Received);
+    if (status != 0) 
+    {
+        cerr << "write error " << status << " " << ::uv_strerror(status) << endl;
+        //uv_close((uv_handle_t*) req->handle, NULL);
+        return;
+    }
+    process();
+}
+
+void NetClientBase::doProcessReceivedBuffer()
+{
+    if (myReceiveBuffer.empty())
+    {
+        return;
+    }
+    int terminatorIdx;
+    while ((terminatorIdx = myReceiveBuffer.find('\n')) >= 0)
+    {
+        string msg1 = myReceiveBuffer.substr(0, terminatorIdx); // without the terminator
+        myReceiveBuffer = myReceiveBuffer.substr(terminatorIdx + 1);
+        // split into tokens
+        std::vector<std::string> tokens; // Create vector to hold our words
         {
-            string msg1 = pending.substr(0, terminatorIdx); // without the terminator
-            pending = pending.substr(terminatorIdx + 1);
-            cerr << "Incoming message: " << myNodeId << " '" << msg1 << "'" << endl;
-            if (msg1.length() > 5 && msg1.substr(0, 5) == "PEER ")
-            {
-                string rest = msg1.substr(5);
-                int spaceIdx = rest.find(' ');
-                //cerr << rest << " " << spaceIdx << endl;
-                if (spaceIdx > 0)
-                {
-                    string word1 = rest.substr(0, spaceIdx);
-                    string word2 = rest.substr(spaceIdx + 1);
-                    //cerr << "words " << word1 << " " << word2 << " " << myPeboNet << endl;
-                    assert(myPeboNet != nullptr);
-                    myPeboNet->msgFromPeboPeer(myNodeId, PeerUpdateMessage(word1, word2, 0, false, 0));
-                }
-            }
-            else if (msg1.length() > 6 && msg1.substr(0, 6) == "QUERY ")
-            {
-                string service = msg1.substr(6);
-                assert(myPeboNet != nullptr);
-                myPeboNet->msgFromPeboPeer(myNodeId, QueryMessage(service, 0));
-            }
+            std::string buf;                 // Have a buffer string
+            std::stringstream ss(msg1);       // Insert the string into a stream
+            while (ss >> buf) tokens.push_back(buf);
+        }
+        cout << "Incoming message: from " << myNodeAddr << " '" << msg1 << "' " << tokens.size() << " " << tokens[0] << endl;
+        assert(myPeboNet != nullptr);
+        if (tokens.size() >= 3 && tokens[0] == "PEER")
+        {
+            myState = State::Received;
+            myPeboNet->msgFromPeboPeer(*this, PeerUpdateMessage(tokens[1], tokens[2], 0, false, 0));
+        }
+        else if (tokens.size() >= 2 && tokens[0] == "QUERY")
+        {
+            myState = State::Received;
+            myPeboNet->msgFromPeboPeer(*this, QueryMessage(tokens[1], 0));
+        }
+        else
+        {
+            cerr << "Error: Unparseable message '" << msg1 << "' " << tokens.size() << endl;
         }
     }
-
-    return errorCode::err_ok;
 }
 
-class SendMessageVisitor: public MessageVisitorBase
+void NetClientBase::on_read(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf)
 {
-public:
-    SendMessageVisitor(NetClientOut & client_in) :
-        MessageVisitorBase(), myClient(client_in) { }
-    virtual ~SendMessageVisitor() = default;
-    void peerUpdate(PeerUpdateMessage const & msg_in);
-    void query(QueryMessage const & msg_in);
-    string getMessage() const { return myMessage; }
-
-private:
-    NetClientOut & myClient;
-    std::string myNodeId;
-    string myMessage;
-};
-
-void SendMessageVisitor::peerUpdate(PeerUpdateMessage const & msg_in)
-{
-    myMessage = "PEER " + msg_in.getService() + " " + msg_in.getEndpoint();
+    //cout << "on_read " << nread << endl; // << " " << (long)buf << " " << (long)buf->base << endl;
+    assert(stream != NULL);
+    IUvSocket* uvSocket = (IUvSocket*)(stream->data);
+    if (uvSocket == nullptr)
+    {
+        cerr << "Fatal error: uvSocket is nullptr " << endl;
+        //uv_close((uv_handle_t*)stream, NULL);
+        //delete stream;
+        return;
+    }
+    //cerr << (long)uvSocket << " " << buf->base[0] << endl;
+    uvSocket->onRead(stream, nread, buf);
 }
 
-void SendMessageVisitor::query(QueryMessage const & msg_in)
+void NetClientBase::alloc_buffer(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
-    myMessage = "QUERY " + msg_in.getService();
+    //cerr << "alloc_buffer " << suggested_size << endl;
+    size_t s = std::min(suggested_size, (size_t)16384);
+    buf->base = new char[s];
+    buf->len = s;
+}
+
+void NetClientBase::onRead(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf)
+{
+    //cout << "onRead " << nread << endl;
+    if (nread < 0)
+    {
+        string errtxt = ::uv_strerror(nread);
+        if (errtxt == "end of file")
+        {
+            // ...
+        }
+        else
+        {
+            cerr << "Read error " << errtxt << " " << nread << " pending " << myReceiveBuffer.length() << endl;
+        }
+        // close socket
+        ::uv_close((uv_handle_t*)stream, NULL);
+        //delete stream;
+        return;
+    }
+    if (nread == 0)
+    {
+        cerr << "Socket closed while reading " << ::uv_strerror(nread) << "  pending " << myReceiveBuffer.length() << endl;
+        //delete stream;
+        return;
+    }
+    if (buf != nullptr && buf->base != nullptr)
+    {
+        myReceiveBuffer.append(string(buf->base));
+        //cerr << "ReceiveBuffer increased to " << myReceiveBuffer.length() << endl;
+        doProcessReceivedBuffer();
+    }
+    //delete stream;
+
+    process();
+}
+
+int NetClientBase::doRead()
+{
+    // communicate with client, process one message
+    //cout << "doRead " << myState << endl;
+    assert(myState == State::Connected || myState == State::Accepted || myState == State::Sent || myState == State::Sending || myState == State::Receiving);
+    myState = State::Receiving;
+    //cout << "doRead " << endl; //(long)((IUvSocket*)this) << " " << (long)((NetClientBase*)this) << " " << (long)((NetClientIn*)this) << endl;
+    ((uv_stream_t*)myUvStream)->data = (void*)dynamic_cast<IUvSocket*>(this);
+    int res = ::uv_read_start((uv_stream_t*)myUvStream, NetClientBase::alloc_buffer, NetClientBase::on_read);
+    if (res < 0)
+    {
+        cerr << "Error from uv_read_start() " << res << " "<< ::uv_err_name(res) << endl;
+        close();
+        return res;
+    }
+    return 0;
+}
+
+bool NetClientBase::isConnected() const
+{
+    if (myUvStream == nullptr) return false;
+    if (myState == State::Undefined || myState == State::NotConnected || myState == State::Connecting || myState == State::Closing || myState == State::Closed) return false;
+    uv_os_fd_t fd;
+    if (::uv_fileno((uv_handle_t*)myUvStream, &fd)) return false;
+    if (fd <= 0) return false;
+    return true;
+}
+
+
+NetClientIn::NetClientIn(IPeboNet* peboNet_in, uv_tcp_t* socket_in, string const & nodeAddr_in) :
+NetClientBase(peboNet_in, nodeAddr_in)
+{
+    setUvStream(socket_in);
+    myState = State::Accepted;
 }
 
 
@@ -141,116 +295,97 @@ myPort(port_in)
 {
 }
 
-
-void NetClientOut::on_write(uv_write_t* req, int status) 
-{
-    UvWriteBaton* baton = (UvWriteBaton*)req;
-    if (baton == nullptr || baton->uvSocket == nullptr)
-    {
-        cerr << "Fatal error: UvWriteBaton.uvSocket is nullptr " << (long)req->handle;
-        uv_close((uv_handle_t*)req->handle, NULL);
-        return;
-    }
-    baton->uvSocket->onWrite(req, status);
-    delete baton;
-}
-
-void NetClientOut::onWrite(uv_write_t* req, int status) 
-{
-    if (status != 0) 
-    {
-        cerr << "write error " << myHost << ":" << myPort << " " << status << " " << uv_strerror(status) << endl;
-        uv_close((uv_handle_t*) req->handle, NULL);
-        return;
-    }
-    doSend(req->handle);
-}
-
 void NetClientOut::on_connect(uv_connect_t* req, int status)
 {
-    //cerr << "on_connect " << status << " " << req->type << endl;
-    UvConnectBaton* baton = (UvConnectBaton*)req;
-    if (baton == nullptr || baton->uvSocket == nullptr)
+    //cout << "on_connect " << status << " " << req->type << endl;
+    IUvSocket* uvSocket = (IUvSocket*)req->data;
+    if (uvSocket == nullptr)
     {
-        cerr << "Fatal error: UvConnectBaton.uvSocket is nullptr " << (long)req->handle;
-        uv_close((uv_handle_t*)req->handle, NULL);
+        cerr << "Fatal error: uvSocket is nullptr " << endl;
+        //uv_close((uv_handle_t*)req->handle, NULL);
+        //delete req;
         return;
     }
-    baton->uvSocket->onConnect(req, status);
-    delete baton;
-}
-
-void NetClientOut::doSend(uv_stream_t* handle)
-{
-    // local copy
-    vector<vector<uint8_t>> sending;
-    while (!mySendQueue.empty())
-    {
-        sending.push_back(mySendQueue.front());
-        mySendQueue.pop();
-    }
-    //cerr << "doSend " << sending.size() << " buffers" << endl;
-    if (sending.empty())
-    {
-        // no more to send, close
-        uv_close((uv_handle_t*)handle, NULL);
-        return;
-    }
-    int n = sending.size();
-    UvWriteBaton* wrbat = new UvWriteBaton(this, n);
-    for (auto i = 0; i < n; ++i)
-    {
-        wrbat->add(sending[i]);
-    }
-    uv_write((uv_write_t*)wrbat, handle, &(wrbat->bufs[0]), wrbat->nbuf, NetClientOut::on_write);
+    uvSocket->onConnect(req, status);
+    delete req;
 }
 
 void NetClientOut::onConnect(uv_connect_t* req, int status)
 {
-    if (status != 0) 
+    //cout << "onConnect " << status << " " << req->type << endl;
+    if (status != 0)
     {
-        cerr << "connect error " << myHost << ":" << myPort << " " << status << " " << uv_strerror(status) << endl;
-        uv_close((uv_handle_t*) req->handle, NULL);
+        cerr << "connect error " << myHost << ":" << myPort << " " << status << " " << ::uv_strerror(status) << endl;
+        uv_close((uv_handle_t*)req->handle, NULL);
         return;
     }
-    doSend(req->handle);
+    myState = State::Connected;
+    cout << "Connected to " << myHost << ":" << myPort << endl;
+    process();
 }
 
-errorCode NetClientOut::sendMsg(BaseMessage const & msg_in)
+int NetClientOut::connect()
 {
-    // convert to message
-    SendMessageVisitor visitor(*this);
-    msg_in.visit(visitor);
-    string msg = visitor.getMessage();
-    //cerr << "sendMsg " << msg << endl;
-    msg += '\n'; // terminator
-    //cerr << "sendMsg " << msg.length() << " '" << msg << "'" << endl;
-    // convert to byte array
-    vector<uint8_t> binstr(msg.begin(), msg.end());
-    mySendQueue.push(binstr);
-
-    if (true)
+    //cout << "NetClientOut::connect " << myHost << ":" << myPort << endl;
+    if (myState >= State::Connected && myState < Closed)
     {
-        //uv_loop_t* loop = (uv_loop_t*)::malloc(sizeof(uv_loop_t));
-        //uv_loop_init(loop);
-
-        uv_loop_t* loop = uv_default_loop();
-
-        uv_tcp_t* socket = (uv_tcp_t*)malloc(sizeof(uv_tcp_t));
-        uv_tcp_init(loop, socket);
-
-        struct sockaddr_in dest;
-        uv_ip4_addr(myHost.c_str(), myPort, &dest);
-
-        UvConnectBaton* connbat = new UvConnectBaton(this);
-        uv_tcp_connect((uv_connect_t*)connbat, socket, (const struct sockaddr*)&dest, NetClientOut::on_connect);
-
-        uv_run(loop, UV_RUN_DEFAULT);
-
-        uv_loop_close(loop);
-        //free(loop);
-        //cerr << "uv loop closed" << endl;
+        cerr << "Fatal error: Connect on connected connection " << myState << endl;
+        return -1;
     }
+    myState = State::Connecting;
+    uv_tcp_t* socket = new uv_tcp_t();
+    ::uv_tcp_init(NetHandler::getUvLoop(), socket);
+    setUvStream(socket);
 
-    return errorCode::err_ok;
+    struct sockaddr_in dest;
+    ::uv_ip4_addr(myHost.c_str(), myPort, &dest);
+
+    uv_connect_t* connreq = new uv_connect_t();
+    connreq->data = (void*)dynamic_cast<IUvSocket*>(this);
+    //cout << "connecting..." << endl;
+    int res = ::uv_tcp_connect(connreq, socket, (const struct sockaddr*)&dest, NetClientOut::on_connect);
+    if (res)
+    {
+        cerr << "Error from uv_tcp_connect() " << res << " " << ::uv_err_name(res) << endl;
+        return res;
+    }
+    return 0;
+}
+
+void NetClientOut::process()
+{
+    //cout << "NetClientOut::process " << myState << endl;
+    switch (myState)
+    {
+        case State::Connected:
+            /*{ TODO
+                // TODO first PeerUpdateMessage
+                //HandshakeMessage msg(getNodeAddr(), myApp->getName());
+                //sendMessage(msg);
+            }*/
+            doRead();
+            break;
+
+        case State::Sending:
+            doRead();
+            break;
+
+        case State::Sent:
+            doRead();
+            break;
+
+        case State::Receiving:
+            doRead();
+            break;
+
+        case State::Received:
+            close();
+            break;
+
+        default:
+            cerr << "Fatal error: unhandled state " << myState << endl;
+            assert(false);
+            break;
+    }
+    return;
 }

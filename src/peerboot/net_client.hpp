@@ -17,53 +17,87 @@ namespace pebo
     class IPeboPeerCB; // forward
 
     /**
-     * Network PeerBoot client.  Simple Clib networking.
+     * Network PeerBoot connection.
      */
-    class NetClientBase: public IPeboPeer
+    class NetClientBase: public IUvSocket, public IPeboPeer
     {
     public:
-        NetClientBase(IPeboNet* peboNet_in, std::string const & nodeId_in);
+        enum State
+        {
+            Undefined = 0,
+            NotConnected,
+            Connecting,
+            Connected,
+            Accepted,
+            Sending,
+            Sent,
+            Receiving,
+            Received,
+            Closing,
+            Closed
+        };
+
+    public:
+        NetClientBase(IPeboNet* peboNet_in, std::string const & nodeAddr_in);
+        virtual ~NetClientBase();
         void setNotifyCB(IPeboPeerCB* peboPeerCB_in);
-        std::string getNodeId() const { return myNodeId; }
+        std::string getNodeAddr() const { return myNodeAddr; }
+        // Send a message to this peer
+        int sendMessage(BaseMessage const & msg_in);
+        int close();
+        void onRead(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
+        void onWrite(uv_write_t* req, int status);
+        void onClose(uv_handle_t* handle);
+        int doRead();
+        virtual void process() { }
+        bool isConnected() const;
+
+    protected:
+        void setUvStream(uv_tcp_t* stream_in);
+
+    private:
+        static void alloc_buffer(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
+        static void on_read(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
+        static void on_write(uv_write_t* req, int status);
+        static void on_close(uv_handle_t* handle);
+        void doProcessReceivedBuffer();
  
     protected:
         IPeboNet* myPeboNet;
-        std::string myNodeId;
+        State myState;
+
+    private:
+        std::string myNodeAddr;
+        std::string myReceiveBuffer;
+        uv_tcp_t* myUvStream;
     };
 
     /**
-     * Network PeerBoot client, incoming connection.  Simple Clib networking.
+     * Network PeerBoot incoming connection.
      */
     class NetClientIn: public NetClientBase
     {
     public:
-        NetClientIn(IPeboNet* peboNet_in, int socket_in, std::string const & nodeId_in);
-        // Send a message to this peer
-        errorCode sendMsg(BaseMessage const & msg_in);
-        errorCode doProcessIncomingMessage();
-
-    private:
-        int mySocket;
+        NetClientIn(IPeboNet* peboNet_in, uv_tcp_t* client_in, std::string const & nodeAddr_in);
     };
 
     /**
-     * Network PeerBoot client, outgoing connection.  Simple Clib networking.
+     * Network PeerBoot outgoing connection.
      */
-    class NetClientOut: public IUvSocket, public NetClientBase
+    class NetClientOut: public NetClientBase
     {
     public:
         NetClientOut(IPeboNet* peboNet_in, std::string const & host_in, int port_in);
-        // Send a message to this peer
-        errorCode sendMsg(BaseMessage const & msg_in);
-        static void on_connect(uv_connect_t* req, int status);
-        static void on_write(uv_write_t* req, int status);
+        int connect();
+        // Perform state-dependent next action in the client state diagram
+        virtual void process();
         void onConnect(uv_connect_t* req, int status);
-        void onWrite(uv_write_t* req, int status);
-        void doSend(uv_stream_t* handle);
+
+    private:
+        static void on_connect(uv_connect_t* req, int status);
 
     private:
         std::string myHost;
         int myPort;
-        std::queue<std::vector<uint8_t>> mySendQueue;
     };
 }

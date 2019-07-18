@@ -60,7 +60,7 @@ errorCode Shell::init(NotificationCB callback_in)
     myNetHandler->init(myPeboNet);
 
     assert(myNetHandler != nullptr);
-    int actualPort = myNetHandler->start(5001, 10);
+    int actualPort = myNetHandler->start(5000, 10);
     //cerr << "actual port " << actualPort << endl;
     if (actualPort < 0)
     {
@@ -119,7 +119,7 @@ errorCode Shell::deinit()
     errorCode res = errorCode::err_ok;
     if (myNetHandler != nullptr)
     {
-        // TODO myNetHandler deinit
+        myNetHandler->stop();
         myNetHandler = nullptr;
     }
     if (myPeboNet != nullptr)

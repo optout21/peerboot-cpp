@@ -5,6 +5,8 @@
 #include <thread>
 #include <vector>
 
+#include <iostream>
+
 namespace pebo
 {
     /**
@@ -19,12 +21,14 @@ namespace pebo
         //errorCode deinit();
         errorCode start();
         errorCode stop();
-        errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in) { assert(false); };
+        void listenStarted(int port) { }
+        void inConnectionReceived(std::string nodeAddr_in, std::shared_ptr<IPeboPeer>& peer_in) { }
+        //errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in) { assert(false); };
         errorCode broadcast(PeerInfo const & peer_in);
-        errorCode queryRemote(service_t service_in) { assert(false); return errorCode::err_generic; }
+        errorCode queryRemote(service_t service_in);
         //std::string getNodeId() { assert(false); return "???"; }
         //void setNodeId(std::string const & nodeId_in) { assert(false); }
-        void msgFromPeboPeer(std::string nodeId_in, BaseMessage const & msg_in) { assert(false); }
+        void msgFromPeboPeer(IPeboPeer& peer_in, BaseMessage const & msg_in) { assert(false); }
 
     private:
         errorCode doClientCallback(PeerInfo const & peer_in);
