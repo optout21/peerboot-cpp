@@ -15,18 +15,21 @@ This is the C++ reference implementation.
 Early prototyping phase.
 
 ## Build instructions
+
 ### Prerequisites
 * C++ compiler
 * CMake (min 3.10)
 * LibUV (libuv1-dev)
+
 ### Obtain sources
 git clone https://github.com/catenocrypt/peerboot-cpp.git
+
 ### Initalize CMake and compile
 cmake -DCMAKE_BUILD_TYPE=Debug .
 
 make
 
-### Sample all
+### Sample app
 ./peerboot_sampleclientapp
 
 
