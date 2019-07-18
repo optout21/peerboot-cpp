@@ -10,8 +10,9 @@ v0.1:
 - TCP connections
 - NO UDP
 
+
 - Serialization/deserialization of messages
-- Listen TCP, handle net messages
+- Listen TCP, handle net messages, with portable lib
 - MsgStore, forward only once, handle only once
 - replacable time source, for testing
 - Forward query msg -- currently there is no limit on it, so it would go endless, PeboNet::queryFromPeboPeer

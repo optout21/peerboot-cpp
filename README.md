@@ -17,10 +17,11 @@ Early prototyping phase.
 ## Build instructions
 ### Prerequisites
 * C++ compiler
-* CMake
-* LibUV (libuv1 and libuv1-dev)
+* CMake (min 3.10)
+* LibUV (libuv1-dev)
 ### Obtain sources
 git clone https://github.com/catenocrypt/peerboot-cpp.git
 ### Initalize CMake and compile
 cmake -DCMAKE_BUILD_TYPE=Debug .
 make
+
