@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+peerboot_demoapp
 peerboot_sampleclientapp
 testapp?
 

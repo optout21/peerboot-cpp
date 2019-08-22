@@ -56,6 +56,7 @@ add_subdirectory(src/test/testlib)
 add_subdirectory(src/test/testapp1)
 add_subdirectory(src/test/testapp2)
 add_subdirectory(src/sample/sampleclientapp)
+add_subdirectory(src/sample/demoapp)
 
 #set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
 
