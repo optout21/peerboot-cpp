@@ -24,7 +24,7 @@ Shell::~Shell()
     deinit();
 }
 
-errorCode Shell::init(NotificationCB callback_in)
+errorCode Shell::init(NotificationCB callback_in, vector<endpoint_t> extraPeers_in, int listenPort_in)
 {
     // TODO thread-safe access to inited
     if (myInited)
@@ -57,10 +57,31 @@ errorCode Shell::init(NotificationCB callback_in)
     }
     assert(myPeboNet != nullptr);
 
+    // add bootstrap peers
+    myPeboNet->addPeer("node1.peerboot.io", 5000);  // TODO default port
+    myPeboNet->addPeer("node2.peerboot.io", 5000);  // TODO default port
+    if (extraPeers_in.size() > 0)
+    {
+        for (auto i(extraPeers_in.begin()), n(extraPeers_in.end()); i != n; ++i)
+        {
+            // TODO port, parse
+            myPeboNet->addPeer(*i, 5000);
+        }
+    }
+
     myNetHandler->init(myPeboNet);
 
+    // Listening port
+    int listenPort = listenPort_in;
+    int listenPortRange = 1;
+    if (listenPort_in == 0)
+    {
+        // default
+        listenPort = 5000;
+        listenPortRange = 25;
+    }
     assert(myNetHandler != nullptr);
-    int actualPort = myNetHandler->start(5000, 10);
+    int actualPort = myNetHandler->start(listenPort, listenPortRange);
     //cerr << "actual port " << actualPort << endl;
     if (actualPort < 0)
     {

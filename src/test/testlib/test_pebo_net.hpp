@@ -22,6 +22,7 @@ namespace pebo
         errorCode start();
         errorCode stop();
         void listenStarted(int port) { }
+        void addPeer(std::string const & host_in, int port_in) { }
         void inConnectionReceived(std::string nodeAddr_in, std::shared_ptr<IPeboPeer>& peer_in) { }
         //errorCode addPeer(std::string nodeId_in, std::shared_ptr<IPeboPeer> const & peer_in) { assert(false); };
         errorCode broadcast(PeerInfo const & peer_in);

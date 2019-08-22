@@ -51,7 +51,7 @@ void PeboNet::listenStarted(int port)
 {
     cout << "App: Listening on port " << port << endl;
 
-    // add sticky bootstrap peers
+    // add extra peers for testing (except to self), TODO remove it later
     int n = 3;
     // try to connect to clients
     for (int i = 0; i < n; ++i)
@@ -61,9 +61,7 @@ void PeboNet::listenStarted(int port)
         // skip connection to self
         if (port != port1)
         {
-            auto client = make_shared<NetClientOut>(this, "localhost", port1);
-            //auto cli = dynamic_pointer_cast<IPeboPeer>(client);
-            addOutPeer(client->getNodeAddr(), client);
+            addPeer("127.0.0.1", port1);
         }
     }
 
@@ -85,6 +83,13 @@ void PeboNet::listenStarted(int port)
     */
 
     tryOutConnections();
+}
+
+void PeboNet::addPeer(std::string const & host_in, int port_in)
+{
+    auto client = make_shared<NetClientOut>(this, host_in, port_in);
+    //auto cli = dynamic_pointer_cast<IPeboPeer>(client);
+    addOutPeer(client->getNodeAddr(), client);
 }
 
 void PeboNet::addInPeer(string nodeAddr_in, shared_ptr<IPeboPeer>& peer_in)

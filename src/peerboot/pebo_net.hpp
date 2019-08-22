@@ -40,6 +40,8 @@ namespace pebo
         errorCode stop();
         /// Called when server is listening on a port already
         void listenStarted(int port);
+        /// Add an outpoing pebo peer connection to host:port
+        void addPeer(std::string const & host_in, int port_in);
         /// Called when a new incoming connection is received
         void inConnectionReceived(std::string nodeAddr_in, std::shared_ptr<IPeboPeer>& peer_in);
         errorCode broadcast(PeerInfo const & peer_in);

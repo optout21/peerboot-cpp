@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace pebo
 {
@@ -18,7 +19,7 @@ namespace pebo
     public:
         Shell();
         ~Shell();
-        errorCode init(NotificationCB callback_in);
+        errorCode init(NotificationCB callback_in, std::vector<endpoint_t> extraPeers_in, int listenPort_in);
         errorCode start(service_t service_in, endpoint_t endpoint_in);
         errorCode stop();
         errorCode deinit();

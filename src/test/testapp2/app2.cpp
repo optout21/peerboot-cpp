@@ -45,7 +45,7 @@ int main()
         auto shell = make_shared<Shell>();
         // If EmptyNetHandler is used, there is no networking.  Otherwise peers within the same process communicate over the net.
         shell->setNetHandler(emptyNetHandler);
-        pebo::errorCode err = shell->init(::notificationCB);
+        pebo::errorCode err = shell->init(::notificationCB, std::vector<endpoint_t>(), 0);
         assert(err == errorCode::err_ok);
         testBench.addShell(shell);
 

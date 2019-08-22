@@ -338,12 +338,17 @@ int NetClientOut::connect()
     setUvStream(socket);
 
     struct sockaddr_in dest;
-    ::uv_ip4_addr(myHost.c_str(), myPort, &dest);
+    int res = ::uv_ip4_addr(myHost.c_str(), myPort, &dest);
+    if (res)
+    {
+        cerr << "Host not found; Error from uv_ip4_addr() " << res << " " << ::uv_err_name(res) << " '" << myHost << "'" << endl;
+        return res;
+    }
 
     uv_connect_t* connreq = new uv_connect_t();
     connreq->data = (void*)dynamic_cast<IUvSocket*>(this);
-    //cout << "connecting..." << endl;
-    int res = ::uv_tcp_connect(connreq, socket, (const struct sockaddr*)&dest, NetClientOut::on_connect);
+    //cout << "connecting to " << myHost << ":" << myPort << "..." << endl;
+    res = ::uv_tcp_connect(connreq, socket, (const struct sockaddr*)&dest, NetClientOut::on_connect);
     if (res)
     {
         cerr << "Error from uv_tcp_connect() " << res << " " << ::uv_err_name(res) << endl;

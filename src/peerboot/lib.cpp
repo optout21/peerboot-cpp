@@ -6,6 +6,7 @@
 #include "shell.hpp"
 #include <cassert>
 #include <mutex>
+#include <vector>
 
 using namespace pebo;
 
@@ -15,6 +16,11 @@ std::mutex global_init_mutex;
 
 errorCode pebo::init(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in)
 {
+    return initEx(service_in, endpoint_in, callback_in, 0, NULL, 0);
+}
+
+errorCode pebo::initEx(service_t service_in, endpoint_t endpoint_in, NotificationCB callback_in, int pbPeerCnt_in, endpoint_t pbPeerList_in[], int pbListenPort_in)
+{
     std::lock_guard<std::mutex> lock(global_init_mutex);
     if (::global_instance != nullptr)
     {
@@ -22,10 +28,17 @@ errorCode pebo::init(service_t service_in, endpoint_t endpoint_in, NotificationC
         return errorCode::err_libAlreadyInited;
     }
     assert (::global_instance == nullptr);
-    
+
+    // process extra peers, if any
+    std::vector<endpoint_t> extraPeers;
+    if (pbPeerCnt_in > 0)
+    {
+        for (int i = 0; i < pbPeerCnt_in; ++i) extraPeers.push_back(pbPeerList_in[i]);
+    }
+
     // create and init library
     Shell* shell_new = new Shell();
-    errorCode err = shell_new->init(callback_in);
+    errorCode err = shell_new->init(callback_in, extraPeers, pbListenPort_in);
     if (err)
     {
         delete shell_new;

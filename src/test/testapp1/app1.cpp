@@ -24,7 +24,7 @@ int main()
     auto shell = make_shared<Shell>();
     shell->setPeboNet(testPeboNet);
     testPeboNet->setNotifyCB(shell.get());
-    pebo::errorCode err = shell->init(::notificationCB);
+    pebo::errorCode err = shell->init(::notificationCB, std::vector<endpoint_t>(), 0);
     if (err)
     {
         cerr << "Could not initialize Shell, err: " << err << " service: " << service << " endpoint: " << endpoint << endl;

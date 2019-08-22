@@ -53,9 +53,25 @@ namespace pebo
     /*
      * Initialize the PeerBoot library and PeerBoot peer client.
      * One instance per process.
+     * @service_in: The service identifier of the P2P network.
+     * @endpoint_in: The endpoint of this client (service endpoint, not peerboot endpoint).
+     * @callback_in: Callback to be called when notifying about new peers.
      * @return: 0 for success, >0 for errors
      */
     pebo::errorCode init(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::NotificationCB callback_in);
+
+    /*
+     * Initialize the PeerBoot library and PeerBoot peer client, extended version.
+     * One instance per process.
+     * @service_in: The service identifier of the P2P network.
+     * @endpoint_in: The endpoint of this client (service endpoint, not peerboot endpoint).
+     * @callback_in: Callback to be called when notifying about new peers.
+     * @pbPeerCnt_in: Number of extra peerboot peers provided, may be 0.
+     * @pbPeerList_in: Extra peerboot peers provided (its size is pbPeerCnt_in).
+     * @pbListenPort_in: Listening port to be used by PeerBoot, 0 means default.
+     * @return: 0 for success, >0 for errors
+     */
+    pebo::errorCode initEx(pebo::service_t service_in, pebo::endpoint_t endpoint_in, pebo::NotificationCB callback_in, int pbPeerCnt_in, pebo::endpoint_t pbPeerList_in[], int pbListenPort_in);
 
     /**
      * De-initialize the library and PeerBoot peer client.

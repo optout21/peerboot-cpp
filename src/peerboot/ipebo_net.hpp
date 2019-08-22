@@ -28,6 +28,8 @@ namespace pebo
         virtual errorCode stop() = 0;
         /// Called when server is listening on a port already
         virtual void listenStarted(int port) = 0;
+        /// Add an outpoing pebo peer connection, host:port
+        virtual void addPeer(std::string const & host_in, int port_in) = 0;
         /// Called when a new incoming connection is received
         virtual void inConnectionReceived(std::string nodeAddr_in, std::shared_ptr<IPeboPeer>& peer_in) = 0;
         //virtual errorCode addPeer(std::string nodeAddr_in, std::shared_ptr<IPeboPeer> const & peer_in) = 0;
