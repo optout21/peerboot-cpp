@@ -87,7 +87,13 @@ void PeboNet::listenStarted(int port)
 
 void PeboNet::addPeer(std::string const & host_in, int port_in)
 {
-    auto client = make_shared<NetClientOut>(this, host_in, port_in);
+    int port = port_in;
+    // default port
+    if (port == 0)
+    {
+        port = 5000; // TODO default port from const
+    }
+    auto client = make_shared<NetClientOut>(this, host_in, port);
     //auto cli = dynamic_pointer_cast<IPeboPeer>(client);
     addOutPeer(client->getNodeAddr(), client);
 }

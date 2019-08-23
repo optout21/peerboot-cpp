@@ -1,6 +1,8 @@
 find_package(Threads)
 
 add_library(libpeerboot
+	endpoint.cpp
+	endpoint.hpp
 	empty_net_handler.cpp
 	empty_net_handler.hpp
 	ipebo_net.hpp

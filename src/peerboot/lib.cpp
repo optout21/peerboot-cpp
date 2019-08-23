@@ -30,10 +30,10 @@ errorCode pebo::initEx(service_t service_in, endpoint_t endpoint_in, Notificatio
     assert (::global_instance == nullptr);
 
     // process extra peers, if any
-    std::vector<endpoint_t> extraPeers;
+    std::vector<Endpoint> extraPeers;
     if (pbPeerCnt_in > 0)
     {
-        for (int i = 0; i < pbPeerCnt_in; ++i) extraPeers.push_back(pbPeerList_in[i]);
+        for (int i = 0; i < pbPeerCnt_in; ++i) extraPeers.push_back(Endpoint(pbPeerList_in[i]));
     }
 
     // create and init library

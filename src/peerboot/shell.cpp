@@ -24,7 +24,7 @@ Shell::~Shell()
     deinit();
 }
 
-errorCode Shell::init(NotificationCB callback_in, vector<endpoint_t> extraPeers_in, int listenPort_in)
+errorCode Shell::init(NotificationCB callback_in, vector<Endpoint> extraPeers_in, int listenPort_in)
 {
     // TODO thread-safe access to inited
     if (myInited)
@@ -58,14 +58,13 @@ errorCode Shell::init(NotificationCB callback_in, vector<endpoint_t> extraPeers_
     assert(myPeboNet != nullptr);
 
     // add bootstrap peers
-    myPeboNet->addPeer("node1.peerboot.io", 5000);  // TODO default port
-    myPeboNet->addPeer("node2.peerboot.io", 5000);  // TODO default port
+    myPeboNet->addPeer("node1.peerboot.io", 5000);  // TODO default port from const
+    myPeboNet->addPeer("node2.peerboot.io", 5000);  // TODO default port from const
     if (extraPeers_in.size() > 0)
     {
         for (auto i(extraPeers_in.begin()), n(extraPeers_in.end()); i != n; ++i)
         {
-            // TODO port, parse
-            myPeboNet->addPeer(*i, 5000);
+            myPeboNet->addPeer(i->getHost(), i->getPort());
         }
     }
 
