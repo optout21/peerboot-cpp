@@ -34,7 +34,7 @@ namespace pebo
         };
 
     public:
-        virtual updateResult_t findAndUpdate(pebo::service_t service_in, pebo::endpoint_t endpoint_in, bool isRemoved_in) = 0;
+        virtual updateResult_t findAndUpdate(pebo::service_t service_in, pebo::endpoint_t endpoint_in, bool isRemoved_in, pebo::timestamp_t lastSeen_in) = 0;
         virtual bool findPeer(pebo::service_t service_in, pebo::endpoint_t endpoint_in, PeerInfo & peerInfo_inout) = 0;
         virtual std::vector<IStore::PeerInfo> query(service_t service_in) const = 0;
         virtual void clear() = 0;

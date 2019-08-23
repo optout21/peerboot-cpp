@@ -38,7 +38,7 @@ void PeerUpdateMessage::visit(MessageVisitorBase & visitor_in) const
 
 std::string PeerUpdateMessage::toString() const
 {
-    return "PEER " + getService() + " " + getEndpoint();
+    return "PEER " + getService() + " " + getEndpoint() + " " + std::to_string(getLastSeen());
 }
 
 

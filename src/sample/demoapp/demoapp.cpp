@@ -10,6 +10,7 @@
 
 #include "../../include/peerboot.hpp"
 #include "peers.hpp"
+#include "../../peerboot/timestamp.hpp"
 
 #include <iostream>
 #include <ctime>
@@ -42,9 +43,11 @@ void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
     // Print out peers
     auto peers = gPeers.getAll();
     cout << peers.size() << " peers:" << endl;
+    auto now = pebo::TimeStamp::now();
     for (auto i(peers.begin()), n(peers.end()); i != n; ++i)
     {
-        cout << "  " << i->first << " " << i->second.lastSeen << endl;
+        auto age = now - i->second.lastSeen;
+        cout << "  ep " << i->first << " age " << age << endl;
     }
 }
 

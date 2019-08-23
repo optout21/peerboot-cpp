@@ -144,7 +144,7 @@ void NetClientBase::on_write(uv_write_t* req, int status)
 void NetClientBase::onWrite(uv_write_t* req, int status)
 {
     //cout << "NetClientBase::onWrite " << status << " "  << myState << endl;
-    assert(myState == State::Connected || myState == State::Sending || myState == State::Receiving || myState == State::Received);
+    assert(myState == State::Connected || myState == State::Sending || myState == State::Receiving || myState == State::Received || myState == State::Closing);
     if (status != 0) 
     {
         cerr << "write error " << status << " " << ::uv_strerror(status) << endl;
@@ -174,10 +174,19 @@ void NetClientBase::doProcessReceivedBuffer()
         }
         cout << "Incoming message: from " << myNodeAddr << " '" << msg1 << "' " << tokens.size() << " " << tokens[0] << endl;
         assert(myPeboNet != nullptr);
-        if (tokens.size() >= 3 && tokens[0] == "PEER")
+        if (tokens.size() >= 4 && tokens[0] == "PEER")
         {
             myState = State::Received;
-            myPeboNet->msgFromPeboPeer(*this, PeerUpdateMessage(tokens[1], tokens[2], 0, false, 0));
+            int lastSeen = 0;
+            try
+            {
+                lastSeen = std::stoi(tokens[3]);
+            }
+            catch(const std::exception& e)
+            {
+                lastSeen = 0;
+            }
+            myPeboNet->msgFromPeboPeer(*this, PeerUpdateMessage(tokens[1], tokens[2], lastSeen, false, 0));
         }
         else if (tokens.size() >= 2 && tokens[0] == "QUERY")
         {

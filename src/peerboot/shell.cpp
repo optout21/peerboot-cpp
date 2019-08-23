@@ -102,7 +102,9 @@ errorCode Shell::start(service_t service_in, endpoint_t endpoint_in)
         return netres;
     }
 
-    // broadcast this client to the net
+    // store this client's endpoint and broadcast it to the net
+    assert(myStore != nullptr);
+    myStore->findAndUpdate(service_in, endpoint_in, false, myPeer.lastSeen);
     broadcast_refresh();
 
     // query for other known endpoints of this service

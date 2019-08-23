@@ -26,7 +26,7 @@ bool Store::findPeer(service_t service_in, endpoint_t endpoint_in, PeerInfo & pe
     return true;
 }
 
-IStore::updateResult_t Store::findAndUpdate(pebo::service_t service_in, pebo::endpoint_t endpoint_in, bool isRemoved_in)
+IStore::updateResult_t Store::findAndUpdate(pebo::service_t service_in, pebo::endpoint_t endpoint_in, bool isRemoved_in, pebo::timestamp_t lastSeen_in)
 {
     lock_guard<mutex> lock(myMutex);
     IStore::updateResult_t res = Store::updateResult_t::upd_invalid;
@@ -36,7 +36,7 @@ IStore::updateResult_t Store::findAndUpdate(pebo::service_t service_in, pebo::en
         service_in,
         endpoint_in,
         now,
-        now,
+        lastSeen_in,
         isRemoved_in
     };
     // check existing
@@ -55,7 +55,8 @@ IStore::updateResult_t Store::findAndUpdate(pebo::service_t service_in, pebo::en
         addPeer(newPeer);
         return IStore::updateResult_t::upd_updatedValue;
     }
-    // update timestamps
+    // update timestamps, preserve addedTime
+    newPeer.addedTime = oldPeer.addedTime;
     addPeer(newPeer);
     return IStore::updateResult_t::upd_updatedOnlyTime;
 }

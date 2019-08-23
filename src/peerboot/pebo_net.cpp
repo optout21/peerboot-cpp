@@ -187,7 +187,7 @@ void PeboNet::setNodeId(std::string const & nodeId_in)
 void PeboNet::peerUpdateFromPeboPeer(IPeboPeer& peer_in, PeerUpdateMessage const & msg_in)
 {
     //cerr << "PeboNet::peerUpdateFromPeboPeer " << myNodeId << " from " << nodeId_in << " " << peer_in.endpoint << endl;
-    IStore::updateResult_t updateRes = myStore->findAndUpdate(msg_in.getService(), msg_in.getEndpoint(), msg_in.getIsRemoved());
+    IStore::updateResult_t updateRes = myStore->findAndUpdate(msg_in.getService(), msg_in.getEndpoint(), msg_in.getIsRemoved(), msg_in.getLastSeen());
     if (updateRes == IStore::updateResult_t::upd_updatedOnlyTime ||
         updateRes == IStore::updateResult_t::upd_noChangeNeeded)
     {
@@ -249,11 +249,11 @@ errorCode PeboNet::doQuery(IPeboPeer& peer_in, service_t service_in)
         // no results
         return errorCode::err_ok;
     }
-    //cerr << "QUERY " << nodeId_in << " " << result.size() << endl;
+    //cerr << "QUERY " << peer_in.getNodeAddr() << " " << result.size() << endl;
     for(auto i = result.cbegin(); i != result.cend(); ++i)
     {
         // send result to net
-        //cerr << "QUERY res " << peer_in.getNodeAddr() << " " << i->endpoint << endl;
+        //cerr << "QUERY res " << peer_in.getNodeAddr() << " " << i->endpoint << " " << i->lastSeen << endl;
         peer_in.sendMessage(PeerUpdateMessage(i->service, i->endpoint, i->lastSeen, i->isRemoved, 0));
     }
     return errorCode::err_ok;

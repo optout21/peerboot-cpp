@@ -17,7 +17,7 @@ namespace pebo
 
     public:
         Store() = default;
-        updateResult_t findAndUpdate(service_t service_in, endpoint_t endpoint_in, bool isRemoved_in);
+        updateResult_t findAndUpdate(service_t service_in, endpoint_t endpoint_in, bool isRemoved_in, pebo::timestamp_t lastSeen_in);
         long count() const;
         std::vector<IStore::PeerInfo> query(service_t service_in) const;
         void clear();
