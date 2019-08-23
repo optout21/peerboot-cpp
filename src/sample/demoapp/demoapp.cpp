@@ -9,6 +9,8 @@
  */
 
 #include "../../include/peerboot.hpp"
+#include "peers.hpp"
+
 #include <iostream>
 #include <ctime>
 
@@ -18,19 +20,32 @@ struct AppParams
 {
     string endPoint;
     int pbListenPort;
-    string pbPeer;
+    string pbExtraPeer;
     void print()
     {
         cout << "Service endpoint:        " << endPoint << endl;
-        cout << "PeerBoot peer:           " << pbPeer << endl;
+        cout << "PeerBoot extra peer:     " << pbExtraPeer << endl;
         cout << "PeerBoot listening port: " << pbListenPort << endl;
         cout << endl;
     }
 };
 
+pebo::Peers gPeers;
+
 void notificationCB(pebo::PeerInfo self_in, pebo::PeerInfo peer_in)
 {
     cout << "Notification: " << (peer_in.isRemoved ? "Removed" : "new    ") << " " << peer_in.service << " " << peer_in.endpoint << " " << peer_in.lastSeen << endl;
+    if (!peer_in.isRemoved)
+    {
+        gPeers.add(peer_in);
+    }
+    // Print out peers
+    auto peers = gPeers.getAll();
+    cout << peers.size() << " peers:" << endl;
+    for (auto i(peers.begin()), n(peers.end()); i != n; ++i)
+    {
+        cout << "  " << i->first << " " << i->second.lastSeen << endl;
+    }
 }
 
 void usage(AppParams const & params_in)
@@ -39,7 +54,7 @@ void usage(AppParams const & params_in)
     cout << endl;
     cout << "Usage:  peerboot_demoapp [options]" << endl;
     cout << "  -ep [endpoint]     Service endpoint, only a data to PeerBoot.  Default: " << params_in.endPoint << endl;
-    cout << "  -peer [endpoint]   Additional/alternative PeerBoot peer.  Optional" << endl;
+    cout << "  -peer [endpoint]   Extra PeerBoot peer.  Optional" << endl;
     cout << "  -port [port]       PeerBoot listening port.  0 for default.  Default: " << params_in.pbListenPort << endl;
     cout << endl;
 }
@@ -58,7 +73,7 @@ void processArgs(AppParams & params_inout, int argn, char ** argc)
         {
             if (i + 1 >= argn) break;
             ++i;
-            params_inout.pbPeer = argc[i];
+            params_inout.pbExtraPeer = argc[i];
         }
         else if (string(argc[i]) == "-port")
         {
@@ -81,7 +96,7 @@ int main(int argn, char ** argc)
     pebo::endpoint_t endpoint (appParams.endPoint);
 
     pebo::endpoint_t peers[1];
-    peers[0] = pebo::endpoint_t(appParams.pbPeer);
+    peers[0] = pebo::endpoint_t(appParams.pbExtraPeer);
     pebo::errorCode err = pebo::initEx(service, endpoint, ::notificationCB, 1, peers, appParams.pbListenPort);
     if (err)
     {

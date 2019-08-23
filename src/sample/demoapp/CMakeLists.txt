@@ -1,6 +1,7 @@
 # sources of this exec
 add_executable(peerboot_demoapp
 	demoapp.cpp
+	peers.cpp
 )
 
 # some compile definitions
