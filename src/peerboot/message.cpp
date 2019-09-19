@@ -3,6 +3,8 @@
 
 using namespace pebo;
 
+const std::string BaseMessage::Prefix = "PB01";
+
 BaseMessage::BaseMessage(messageType type_in, timestamp_t createdTime_in) :
 myType(type_in),
 myCreatedTime(createdTime_in)
@@ -38,7 +40,7 @@ void PeerUpdateMessage::visit(MessageVisitorBase & visitor_in) const
 
 std::string PeerUpdateMessage::toString() const
 {
-    return "PEER " + getService() + " " + getEndpoint() + " " + std::to_string(getLastSeen());
+    return Prefix + " " + "PEER" + " " + getService() + " " + getEndpoint() + " " + std::to_string(getLastSeen());
 }
 
 
@@ -55,5 +57,5 @@ void QueryMessage::visit(MessageVisitorBase & visitor_in) const
 
 std::string QueryMessage::toString() const
 {
-    return "QUERY " + getService();
+    return Prefix + " " + "QUERY" + " " + getService();
 }

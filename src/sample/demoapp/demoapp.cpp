@@ -57,8 +57,11 @@ void usage(AppParams const & params_in)
     cout << endl;
     cout << "Usage:  peerboot_demoapp [options]" << endl;
     cout << "  -ep [endpoint]     Service endpoint, only a data to PeerBoot.  Default: " << params_in.endPoint << endl;
-    cout << "  -peer [endpoint]   Extra PeerBoot peer.  Optional" << endl;
+    cout << "  -peer [endpoint]   Extra PeerBoot peer.  Optional.  Example: -peer localhost:5500" << endl;
     cout << "  -port [port]       PeerBoot listening port.  0 for default.  Default: " << params_in.pbListenPort << endl;
+    cout << "Simple example:" << endl;
+    cout << "  peerboot_demoapp -ep EP1_5000" << endl;
+    cout << "  peerboot_demoapp -ep EP2_5005 -port 5005 -peer localhost:5000" << endl;
     cout << endl;
 }
 

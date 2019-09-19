@@ -172,30 +172,42 @@ void NetClientBase::doProcessReceivedBuffer()
             std::stringstream ss(msg1);       // Insert the string into a stream
             while (ss >> buf) tokens.push_back(buf);
         }
-        cout << "Incoming message: from " << myNodeAddr << " '" << msg1 << "' " << tokens.size() << " " << tokens[0] << endl;
+        if (tokens.size() < 2)
+        {
+            // too few tokens, prefix and message type are required at least
+            cerr << "Error: Too few tokens " << tokens.size() << " '" << msg1 << "'" << endl;
+            continue;
+        }
+        cout << "Incoming message: from " << myNodeAddr << " " << tokens.size() << " " << tokens[1] << " '" << msg1 << "'" << endl;
         assert(myPeboNet != nullptr);
-        if (tokens.size() >= 4 && tokens[0] == "PEER")
+        if (tokens[0] != BaseMessage::Prefix)
+        {
+            // wrong prefix/version
+            cerr << "Error: Wrong prefix/version " << tokens[0] << " '" << msg1 << "'" << endl;
+            continue;
+        }
+        if (tokens.size() >= 5 && tokens[1] == "PEER")
         {
             myState = State::Received;
             int lastSeen = 0;
             try
             {
-                lastSeen = std::stoi(tokens[3]);
+                lastSeen = std::stoi(tokens[4]);
             }
             catch(const std::exception& e)
             {
                 lastSeen = 0;
             }
-            myPeboNet->msgFromPeboPeer(*this, PeerUpdateMessage(tokens[1], tokens[2], lastSeen, false, 0));
+            myPeboNet->msgFromPeboPeer(*this, PeerUpdateMessage(tokens[2], tokens[3], lastSeen, false, 0));
         }
-        else if (tokens.size() >= 2 && tokens[0] == "QUERY")
+        else if (tokens.size() >= 3 && tokens[1] == "QUERY")
         {
             myState = State::Received;
-            myPeboNet->msgFromPeboPeer(*this, QueryMessage(tokens[1], 0));
+            myPeboNet->msgFromPeboPeer(*this, QueryMessage(tokens[2], 0));
         }
         else
         {
-            cerr << "Error: Unparseable message '" << msg1 << "' " << tokens.size() << endl;
+            cerr << "Error: Unparseable message " << tokens.size() << " '" << msg1 << "'" << endl;
         }
     }
 }

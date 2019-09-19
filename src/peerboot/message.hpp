@@ -27,6 +27,8 @@ namespace pebo
         virtual void visit(MessageVisitorBase & visitor_in) const = 0;
         virtual std::string toString() const = 0;
 
+        static const std::string Prefix;
+
     private:
         messageType myType;
         timestamp_t myCreatedTime;
